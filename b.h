@@ -12,5 +12,6 @@ struct alarm {
 };
 
 time_t parse_time(char time_string[]);
-void add_alarm(struct alarm *a, int pid, char time_string[]);
-void remove_alarm(struct alarm *a, int pid);
+void add_alarm(struct alarm *a, pid_t pid, char time_string[]); 
+void remove_alarm(struct alarm *a, pid_t pid);
+char *parse_seconds(char str[],time_t seconds);
