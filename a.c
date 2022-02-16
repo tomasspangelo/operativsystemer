@@ -1,6 +1,13 @@
+#ifndef "a.h"
 #include "a.h"
+#endif
+#ifndef "b.h"
 #include "b.h"
+#endif
+#ifndef "c.h"
 #include "c.h"
+#endif
+
 
 void menySystem(){
     char time_str[20];
@@ -18,10 +25,7 @@ void menySystem(){
                 char time_string[20];
                 getchar();
                 scanf("%[^\n]%*c", time_string);
-                pid_t pid = 0; // bytt ut 0 med det som returneres fra fork (eventuelt kan logikken flyttes til add_alarm)
-                add_alarm(alarms, pid, time_string);
-                createAlarmInstance(pid, alarms[pid].seconds - time(NULL)); //  lager child
-                printf("Scheduling alarm in %ld seconds\n", alarms[pid].seconds - time(NULL));
+                pid_t pid = createAlarmInstance(time_string, alarms); //  lager child
                 break;
             case 'l':
                  //list comands
