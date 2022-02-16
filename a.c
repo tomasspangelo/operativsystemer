@@ -21,7 +21,26 @@ void menySystem(){
                 pid_t pid = createAlarmInstance(time_string, alarms, index_stack, &top); //  lager child
                 break;
             case 'l':
-                 //list comands
+                 for (int i = 0; i < 10; i++)
+                 {
+                     bool active = true;
+                     for (int j = 0; j <= top; j++)
+                     {
+                         if (index_stack[j] == i){
+                             active = false;
+                             break;
+                         }
+                     }
+                     if (active)
+                     {
+                         char alarm_time[20];
+                         parse_seconds(alarm_time, alarms[i].seconds);
+                         printf("Alarm %d scheduled at %s\n", i, alarm_time);
+                     }
+                     
+                     
+                 }
+                 
                  break;
             case 'c':
                  printf("Cancel which alarm?\n");

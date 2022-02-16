@@ -2,6 +2,7 @@
 
 time_t parse_time(char time_string[]){
     struct tm t;
+    t.tm_isdst = -1;
     strptime(time_string, "%Y-%m-%d %H:%M:%S", &t);
     return mktime(&t);
 }
