@@ -1,12 +1,4 @@
-#ifndef "a.h"
 #include "a.h"
-#endif
-#ifndef "b.h"
-#include "b.h"
-#endif
-#ifndef "c.h"
-#include "c.h"
-#endif
 
 void menySystem(){
     char time_str[20];
@@ -31,7 +23,7 @@ void menySystem(){
                  break;
             case 'c':
                  printf("Cancel which alarm?\n");
-                 //funksjon for å avslutte alarm
+                 // killAlarm(indeks for alarm) //funksjon for å avslutte alarm
                  break;
             case 'x':
                 printf("Goodbye!");

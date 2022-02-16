@@ -1,12 +1,4 @@
-#ifndef "a.h"
 #include "a.h"
-#endif
-#ifndef "b.h"
-#include "b.h"
-#endif
-#ifndef "c.h"
-#include "c.h"
-#endif
 
 time_t parse_time(char time_string[]){
     struct tm t;

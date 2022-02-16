@@ -1,13 +1,4 @@
-#ifndef "a.h"
 #include "a.h"
-#endif
-#ifndef "b.h"
-#include "b.h"
-#endif
-#ifndef "c.h"
-#include "c.h"
-#endif
-
 
 pid_t createAlarmInstance(char *time_string, struct alarm *alarms) {
     while (1) {
@@ -16,6 +7,7 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms) {
         time_t seconds_delta = seconds - time(NULL);
         printf("Scheduling alarm in %ld seconds\n", seconds_delta);
         pid = fork();
+        printf("%d \n", pid);
         if (pid == 0) {
             sleep(seconds_delta);
             printf("RING! \a\n");
