@@ -7,6 +7,8 @@ void menySystem(){
     printf("Please enter \"s\" (schedule), \"l\" (list), \"c\" (cancel), \"x\" (exit)\n");
     int status=1;
     struct alarm alarms[10];
+    int index_stack[10] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    int top = 9;
     while(status){
         char choice = getchar();
         switch(choice)
@@ -16,7 +18,7 @@ void menySystem(){
                 char time_string[20];
                 getchar();
                 scanf("%[^\n]%*c", time_string);
-                pid_t pid = createAlarmInstance(time_string, alarms); //  lager child
+                pid_t pid = createAlarmInstance(time_string, alarms, index_stack, &top); //  lager child
                 break;
             case 'l':
                  //list comands

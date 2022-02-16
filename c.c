@@ -1,6 +1,6 @@
 #include "a.h"
 
-pid_t createAlarmInstance(char *time_string, struct alarm *alarms) {
+pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top) {
     while (1) {
         pid_t pid;
         time_t seconds = parse_time(time_string);
@@ -14,7 +14,7 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms) {
             exit(0);
         } else {
             printf("New child");
-            add_alarm(alarms, pid, seconds);
+            add_alarm(alarms, pid, seconds, index_stack, top);
         }
         return pid;
     }

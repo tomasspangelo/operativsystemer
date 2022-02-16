@@ -14,9 +14,9 @@ struct alarm {
 };
 
 time_t parse_time(char time_string[]);
-void add_alarm(struct alarm *a, pid_t pid, int seconds); 
+void add_alarm(struct alarm *a, pid_t pid, int seconds, int *index_stack, int *top);
 void remove_alarm(struct alarm *a, pid_t pid);
 char *parse_seconds(char str[],time_t seconds);
 
 void menySystem();
-pid_t createAlarmInstance(char *time_string, struct alarm *alarms);
+pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top);
