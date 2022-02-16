@@ -3,7 +3,6 @@
 #include <sys/types.h>
 #include <stdio.h>
 #include <stdbool.h>
-#pragma once
 
 struct alarm {
     time_t seconds;

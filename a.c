@@ -8,7 +8,6 @@
 #include "c.h"
 #endif
 
-
 void menySystem(){
     char time_str[20];
     printf("Welcome to the alarm clock! ");
