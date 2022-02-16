@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <unistd.h> //fork()
 #include <stdlib.h> //exit()
+#include <signal.h> //kill()
 
 struct alarm {
     time_t seconds;

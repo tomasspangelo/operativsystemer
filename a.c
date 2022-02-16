@@ -56,7 +56,17 @@ void menySystem(){
                  break;
             case 'c':
                  printf("Cancel which alarm?\n");
-                 // killAlarm(indeks for alarm) //funksjon for å avslutte alarm
+                 getchar();
+                 int index;
+                 scanf("%d", &index);
+                 if (index > 9 || !alarms[index].active)
+                 {
+                     printf("Invalid index.\n");
+                     break;
+                 }
+                 kill(alarms[index].process_id, 9);
+                 waitpid(alarms[index].process_id, NULL, 0);
+                 remove_alarm(alarms, index, index_stack, &top);
                  break;
             case 'x':
                 printf("Goodbye!");
@@ -67,7 +77,7 @@ void menySystem(){
             default:
                 printf("Not an option.\n");
         }
-        //system("ps");
+        system("ps");
     }
 }
 
