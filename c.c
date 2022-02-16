@@ -7,13 +7,11 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_st
         time_t seconds_delta = seconds - time(NULL);
         printf("Scheduling alarm in %ld seconds\n", seconds_delta);
         pid = fork();
-        printf("%d \n", pid);
         if (pid == 0) {
             sleep(seconds_delta);
             printf("RING! \a\n");
             exit(0);
         } else {
-            printf("New child");
             add_alarm(alarms, pid, seconds, index_stack, top);
         }
         return pid;
