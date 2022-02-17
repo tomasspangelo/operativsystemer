@@ -9,6 +9,12 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_st
         pid = fork();
         if (pid == 0) {
             sleep(seconds_delta);
+            #ifdef __APPLE__
+                system("afplay ./bensound-jazzyfrenchy.mp3 -t 5");
+            #elif __linux__
+                system("mgp123 ./bensound-jazzyfrenchy.mp3 -t 5")
+            #endif
+
             printf("RING! \a\n");
             exit(0);
         } else {
