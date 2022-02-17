@@ -12,7 +12,7 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_st
             #ifdef __APPLE__
                 system("afplay ./bensound-jazzyfrenchy.mp3 -t 5");
             #elif __linux__
-                system("mgp123 ./bensound-jazzyfrenchy.mp3 -t 5")
+                system("mpg123 ./bensound-jazzyfrenchy.mp3 -t 5")
             #endif
 
             printf("RING! \a\n");
