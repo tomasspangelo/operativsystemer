@@ -21,4 +21,7 @@ char *parse_seconds(char str[],time_t seconds);
 
 void menySystem();
 pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top, int song);
+
 void playSong(int song);
+void playSounds();
+int chooseSound();

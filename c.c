@@ -11,6 +11,7 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_st
             sleep(seconds_delta);
 
             playSong(song);
+            printf("Ring!\n")
             exit(0);
         } else {
             add_alarm(alarms, pid, seconds, index_stack, top);
