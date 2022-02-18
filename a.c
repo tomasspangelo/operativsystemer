@@ -28,7 +28,7 @@ void menySystem(){
                     printf("Sorry, you have reached the maximum number of alarms.\n");
                     break;
                 }
-                 
+                
                 printf("Schedule alarm at which date and time?: ");
                 char time_string[20];
                 getchar();
@@ -38,8 +38,13 @@ void menySystem(){
                     printf("You cannot schedule an alarm in the past...\n");
                     break;
                 }
-                pid_t pid = createAlarmInstance(time_string, alarms, index_stack, &top); //  lager child
+                printf("Which sonund do you want as the alarm (Choose between 1-4)");
+                int sound;
+                scanf("%d", &sound);
+                printf("You entered: %d", sound);
+                pid_t pid = createAlarmInstance(time_string, alarms, index_stack, &top, sound); //  lager child
                 break;
+
             case 'l':
                  for (int i = 0; i < 10; i++)
                  {
@@ -54,6 +59,7 @@ void menySystem(){
                  }
                  
                  break;
+
             case 'c':
                  printf("Cancel which alarm?\n");
                  getchar();
@@ -68,12 +74,15 @@ void menySystem(){
                  waitpid(alarms[index].process_id, NULL, 0);
                  remove_alarm(alarms, index, index_stack, &top);
                  break;
+
             case 'x':
                 printf("Goodbye!");
                 status= 0;
                 break;
+
             case '\n':
                 break; //Ignore enter
+
             default:
                 printf("Not an option.\n");
         }

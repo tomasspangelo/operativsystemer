@@ -8,6 +8,7 @@ struct alarm {
     time_t seconds;
     pid_t process_id;
     bool active;
+    int song;
 
 };
 

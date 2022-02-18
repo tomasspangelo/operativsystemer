@@ -15,7 +15,6 @@ char *parse_seconds(char str[],time_t seconds) {
 
 void add_alarm(struct alarm *a, pid_t pid, int seconds, int *index_stack, int *top) {
     struct alarm new_alarm = {.seconds = seconds, .process_id = pid, .active = 1};
-    a[index_stack[*top]] = new_alarm;
     (*top) --;
 
 }
