@@ -14,20 +14,20 @@ char *parse_seconds(char str[],time_t seconds) {
     return str;
 }
 
-void add_alarm(struct alarm *a, pid_t pid, int seconds, int *index_stack, int *top) {
-    struct alarm new_alarm = {.seconds = seconds, .process_id = pid, .active = 1};
+void add_alarm(struct Alarm *a, pid_t pid, int seconds, int *index_stack, int *top) {
+    struct Alarm new_alarm = {.seconds = seconds, .process_id = pid, .active = 1};
     a[index_stack[*top]] = new_alarm;
     (*top) --;
 
 }
 
-void remove_alarm(struct alarm *a, int index, int *index_stack, int *top) {
+void remove_alarm(struct Alarm *a, int index, int *index_stack, int *top) {
     a[index].active = 0;
     (*top) ++;
     index_stack[*top] = index;
 }
 
-pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top,int song) {
+pid_t create_alarm_instance(char *time_string, struct Alarm *alarms, int *index_stack, int *top,int song) {
     while (1) {
         pid_t pid;
         time_t seconds = parse_time(time_string);
@@ -37,8 +37,8 @@ pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_st
         if (pid == 0) {
             sleep(seconds_delta);
 
-            play_song(song);
             printf("Ring!\n");
+            play_song(song);
             exit(0);
         } else {
             add_alarm(alarms, pid, seconds, index_stack, top);

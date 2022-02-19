@@ -7,7 +7,7 @@
 #include <stdlib.h> //exit()
 #include <signal.h> //kill()
 
-struct alarm {
+struct Alarm {
     time_t seconds;
     pid_t process_id;
     bool active;
@@ -15,9 +15,9 @@ struct alarm {
 
 
 time_t parse_time(char time_string[]);
-void add_alarm(struct alarm *a, pid_t pid, int seconds, int *index_stack, int *top);
-void remove_alarm(struct alarm *a, int index, int *index_stack, int *top);
+void add_alarm(struct Alarm *a, pid_t pid, int seconds, int *index_stack, int *top);
+void remove_alarm(struct Alarm *a, int index, int *index_stack, int *top);
 char *parse_seconds(char str[],time_t seconds);
 
 
-pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top, int song);
+pid_t create_alarm_instance(char *time_string, struct Alarm *alarms, int *index_stack, int *top, int song);

@@ -7,7 +7,7 @@ void meny_system(){
     printf("It is currently %s\n", parse_seconds(time_str, time(NULL))); //fikse tidspunkt + dato for nå
     printf("Please enter \"s\" (schedule), \"l\" (list), \"c\" (cancel),  \"p\" (play songs), \"x\" (exit)\n");
     int status=1;
-    struct alarm alarms[10];
+    struct Alarm alarms[10];
     for (int i; i < 10; i++){
         alarms[i].active = 0;
     }
@@ -34,15 +34,15 @@ void meny_system(){
                 char time_string[20];
                 getchar();
                 scanf("%[^\n]%*c", time_string);
+   
+                int sound = choose_sound();
                 if (parse_time(time_string) < time(NULL))
                 {
                     printf("You cannot schedule an alarm in the past...\n");
                     break;
                 }
-   
-                int sound = choose_sound();
 
-                pid_t pid = createAlarmInstance(time_string, alarms, index_stack, &top, sound); //  lager child
+                pid_t pid = create_alarm_instance(time_string, alarms, index_stack, &top, sound); //  lager child
                 break;
 
             case 'l':
@@ -78,7 +78,7 @@ void meny_system(){
                 break;
 
             case 'x':
-                printf("Goodbye!");
+                printf("Goodbye!\n");
                 status= 0;
                 break;
 
