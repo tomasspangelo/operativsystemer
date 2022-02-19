@@ -5,7 +5,7 @@ void play_song(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-jazzyfrenchy.mp3 -t 5");
              #elif __linux__
-                system("mpg123 -n 192 music/bensound-jazzyfrenchy.mp3");
+                system("mpg123 -n 192 music/bensound-jazzyfrenchy.mp3"); //plays 192 frames of .mp3 approxiamtely 5 seconds
             #endif
             break;
         
