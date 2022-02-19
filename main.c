@@ -8,7 +8,7 @@ void meny_system(){
     printf("Please enter \"s\" (schedule), \"l\" (list), \"c\" (cancel),  \"p\" (play songs), \"x\" (exit)\n");
     int status=1;
     struct Alarm alarms[10];
-    for (int i; i < 10; i++){
+    for (int i = 0; i < 10; i++){
         struct Alarm new_alarm = {.seconds = 0, .process_id = 0, .active = 0};
         alarms[i] = new_alarm;
     }
