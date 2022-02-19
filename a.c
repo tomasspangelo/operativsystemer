@@ -40,7 +40,7 @@ void menySystem(){
                 }
    
                 int sound = chooseSound();
-                
+
                 pid_t pid = createAlarmInstance(time_string, alarms, index_stack, &top, sound); //  lager child
                 break;
 
@@ -74,6 +74,7 @@ void menySystem(){
 
             case 'p':
                 playSounds();
+                break;
 
             case 'x':
                 printf("Goodbye!");
