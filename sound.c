@@ -5,7 +5,7 @@ void play_song(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-jazzyfrenchy.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 -n 192 music/bensound-jazzyfrenchy.mp3");
+                system("mpg123 -n 192 music/bensound-jazzyfrenchy.mp3");
             #endif
             break;
         
@@ -13,7 +13,7 @@ void play_song(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-acousticbreeze.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 -n 192 music/bensound-acousticbreeze.mp3");
+                system("mpg123 -n 192 music/bensound-acousticbreeze.mp3");
             #endif
             break;
 
@@ -21,7 +21,7 @@ void play_song(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-memories.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 -n 192  music/bensound-memories.mp3"); //Plays mp3 for 192 frames. Approximately 5 seconds
+                system("mpg123 -n 192 music/bensound-memories.mp3");
             #endif
             break;
 
@@ -29,7 +29,7 @@ void play_song(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-littleidea.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 -n 192  music/bensound-littleidea.mp3");
+                system("mpg123 -n 192 music/bensound-littleidea.mp3");
             #endif
             break;
 
