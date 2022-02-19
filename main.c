@@ -9,7 +9,8 @@ void meny_system(){
     int status=1;
     struct Alarm alarms[10];
     for (int i; i < 10; i++){
-        alarms[i].active = 0;
+        struct Alarm new_alarm = {.seconds = 0, .process_id = 0, .active = 0};
+        alarms[i] = new_alarm;
     }
     int index_stack[10] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
     int top = 9;
