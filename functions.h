@@ -19,9 +19,5 @@ void add_alarm(struct alarm *a, pid_t pid, int seconds, int *index_stack, int *t
 void remove_alarm(struct alarm *a, int index, int *index_stack, int *top);
 char *parse_seconds(char str[],time_t seconds);
 
-void menySystem();
-pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top, int song);
 
-void playSong(int song);
-void playSounds();
-int chooseSound();
+pid_t createAlarmInstance(char *time_string, struct alarm *alarms, int *index_stack, int *top, int song);

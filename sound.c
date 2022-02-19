@@ -1,12 +1,11 @@
-# include "a.h"
-
-void playSong(int song){
+#include "sound.h"
+void play_song(int song){
     switch(song){
         case 1:
             #ifdef __APPLE__
                 system("afplay music/bensound-jazzyfrenchy.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 music/bensound-jazzyfrenchy.mp3 -t 5");
+                 system("mpg123 -n 192 music/bensound-jazzyfrenchy.mp3");
             #endif
             break;
         
@@ -14,7 +13,7 @@ void playSong(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-acousticbreeze.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 music/bensound-acousticbreeze.mp3 -t 5");
+                 system("mpg123 -n 192 music/bensound-acousticbreeze.mp3");
             #endif
             break;
 
@@ -22,7 +21,7 @@ void playSong(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-memories.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 music/bensound-memories.mp3 -t 5");
+                 system("mpg123 -n 192  music/bensound-memories.mp3"); //Plays mp3 for 192 frames. Approximately 5 seconds
             #endif
             break;
 
@@ -30,27 +29,25 @@ void playSong(int song){
             #ifdef __APPLE__
                 system("afplay music/bensound-littleidea.mp3 -t 5");
              #elif __linux__
-                 system("mpg123 music/bensound-littleidea.mp3 -t 5");
+                 system("mpg123 -n 192  music/bensound-littleidea.mp3");
             #endif
             break;
 
         default:
             printf("No such song\n");
     }
-
-        //system("afplay and song=%s and -t 5");
     
 }
 
-void playSounds(){
+void play_sounds(){
     int i;
     for(i = 1 ; i <= 4; i++){
-        playSong(i);
+        play_song(i);
     }
 }
 
-int chooseSound(){
-    printf("Which sonund do you want as the alarm (Choose between 1-4)\n");
+int choose_sound(){
+    printf("Which sound do you want as the alarm (Choose between 1-4)\n");
     int sound;
     while(true){
         scanf("%d", &sound);
