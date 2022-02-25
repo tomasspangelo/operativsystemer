@@ -16,12 +16,13 @@ void meny_system(){
         struct Alarm new_alarm = {.seconds = 0, .process_id = 0, .active = 0};
         alarms[i] = new_alarm;
     }
-    int index_stack[10] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0};
+    // stack with indexes in alarms that are not used
+    int index_stack[10] = {9, 8, 7, 6, 5, 4, 3, 2, 1, 0}; 
+    //top of the stack
     int top = 9;
     while(status){
         char choice = getchar();
-        //Removes alarm if active and time is run out
-        //Removes zombies
+        //Removes alarm and zombie process if active and time is run out
         for (int i = 0; i < 10; i++) {
             if (alarms[i].active && alarms[i].seconds < time(NULL)) {
                 waitpid(alarms[i].process_id, NULL, 0);
@@ -82,7 +83,7 @@ void meny_system(){
                      printf("Invalid index.\n");
                      break;
                  }
-                 //Kill alarm, catch zombies and remove alarm
+                 //Kill alarm, catch zombie and remove alarm
                  kill(alarms[index].process_id, 9);
                  waitpid(alarms[index].process_id, NULL, 0);
                  remove_alarm(alarms, index, index_stack, &top);
