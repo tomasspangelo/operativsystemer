@@ -31,7 +31,7 @@ void meny_system(){
         switch(choice)
         {
             case 's':
-                //Not more spaces in stack
+                //No more spaces in stack
                 if (top==-1)
                 {
                     printf("Sorry, you have reached the maximum number of alarms.\n");
@@ -44,14 +44,15 @@ void meny_system(){
                 scanf("%[^\n]%*c", time_string);
    
                 int sound = choose_sound();
-                //If time is in the past, cant scedule
+
+                //If time is in the past, can't scedule
                 if (parse_time(time_string) < time(NULL))
                 {
                     printf("You cannot schedule an alarm in the past...\n");
                     break;
                 }
 
-                //Creates child with given pid
+                //Creates child process, process id is returned
                 pid_t pid = create_alarm_instance(time_string, alarms, index_stack, &top, sound); 
                 break;
 
@@ -74,12 +75,14 @@ void meny_system(){
                  getchar();
                  int index;
                  scanf("%d", &index);
+
+                 //Cannot cancel an alarm that is not active 
                  if (index > 9 || !alarms[index].active)
                  {
                      printf("Invalid index.\n");
                      break;
                  }
-                 //Kills alarm, catch zombies and remove alarm if index is valid
+                 //Kill alarm, catch zombies and remove alarm
                  kill(alarms[index].process_id, 9);
                  waitpid(alarms[index].process_id, NULL, 0);
                  remove_alarm(alarms, index, index_stack, &top);
