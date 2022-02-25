@@ -7,6 +7,7 @@
 #include <stdlib.h> //exit()
 #include <signal.h> //kill()
 
+//Alarm struct with information about the alarm
 struct Alarm {
     time_t seconds;
     pid_t process_id;

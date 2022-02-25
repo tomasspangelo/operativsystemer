@@ -1,7 +1,9 @@
 #include "sound.h"
+//Plays one og four songs
 void play_song(int song){
     switch(song){
         case 1:
+            // Checks which operating system you have (linux or ios), and uses correct function
             #ifdef __APPLE__
                 system("afplay music/bensound-jazzyfrenchy.mp3 -t 5");
              #elif __linux__
@@ -39,6 +41,7 @@ void play_song(int song){
     
 }
 
+//plays all the sounds
 void play_sounds(){
     int i;
     for(i = 1 ; i <= 4; i++){
@@ -46,6 +49,7 @@ void play_sounds(){
     }
 }
 
+//Shown to user i menu
 int choose_sound(){
     printf("Which sound do you want as the alarm (Choose between 1-4)\n");
     int sound;
