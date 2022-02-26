@@ -40,7 +40,7 @@ void remove_alarm(struct Alarm *a, int index, int *index_stack, int *top) {
     index_stack[*top] = index;
 }
 
-//Creates a subprocess of the main process with fork()
+//Creates a subprocess of the main process with fork() for each alarm
 //time_string: pointer to time for alarm
 //alarms: pointer to alarm structs
 //index_stack: pointer to index of the stack containing alarms
