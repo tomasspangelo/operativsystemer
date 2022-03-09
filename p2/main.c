@@ -63,7 +63,7 @@ int main() {
         snprintf (msg, sizeof (msg),
             "HTTP/1.0 200 OK\n"
             "Content-Type: text/html\n"
-            "Content-Length: %d\n\n%s", strlen (body), body);
+            "Content-Length: %ld\n\n%s", strlen (body), body);
 
         //Skrivel OK melding, og Hello
         
