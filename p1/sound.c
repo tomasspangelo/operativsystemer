@@ -1,5 +1,6 @@
 #include "sound.h"
 //Plays one og four songs
+//song: chosen song by user
 void play_song(int song){
     switch(song){
         case 1:
@@ -41,7 +42,7 @@ void play_song(int song){
     
 }
 
-//plays all the sounds
+//plays all the sounds (in correct order)
 void play_sounds(){
     int i;
     for(i = 1 ; i <= 4; i++){

@@ -40,6 +40,12 @@ void remove_alarm(struct Alarm *a, int index, int *index_stack, int *top) {
     index_stack[*top] = index;
 }
 
+//Creates a subprocess of the main process with fork() for each alarm
+//time_string: pointer to time for alarm
+//alarms: pointer to alarm structs
+//index_stack: pointer to index of the stack containing alarms
+//top: pointer to the first free space in the alarm stack
+//song: Variable of the song that is to be played when the alarm goes off
 pid_t create_alarm_instance(char *time_string, struct Alarm *alarms, int *index_stack, int *top,int song) {
     while (1) {
         pid_t pid;
