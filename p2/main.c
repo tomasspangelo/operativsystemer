@@ -55,9 +55,18 @@ int main() {
         n = read (newsockfd,buffer,sizeof(buffer)-1);
 
         if (n < 0) error("ERROR reading from socket");
+        snprintf (body, sizeof (body),
+            "<html>\n<body>\n"
+            "<h1>Hello web browser</h1>\nYour request was\n"
+            "<pre>%s</pre>\n"
+            "</body>\n</html>\n", buffer);
+        snprintf (msg, sizeof (msg),
+            "HTTP/1.0 200 OK\n"
+            "Content-Type: text/html\n"
+            "Content-Length: %d\n\n%s", strlen (body), body);
 
         //Skrivel OK melding, og Hello
-        snprintf(msg, sizeof(msg), "HTTP/1.0 200 OK\r\n\r\nHello");
+        
 
         n = write (newsockfd,msg,strlen(msg));
         if (n < 0) error("ERROR writing to socket");
