@@ -11,15 +11,66 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 #include <netdb.h>
+#include <string.h>
+
 
 //constants
 
 //not reserved
-#define PORT 7300
+#define PORT 7219
 
 #define MAXREQ (4096*1024)
 
 char buffer[MAXREQ], body[MAXREQ], msg[MAXREQ];
+
+void file_to_string(int sockfd, char *filepath) {
+    FILE *fp = fopen(filepath, "r");
+    char ch;
+
+    if (fp == NULL)
+    {
+        perror("Error while opening the file.\n");
+        exit(EXIT_FAILURE);
+    }
+    int i = 0;
+    while(1) {
+        ch = fgetc(fp);
+        if (feof(fp)) {
+            break;
+        }
+        body[i] = ch;
+        i ++;
+    }
+    body[i] = '\0';
+    fclose(fp);
+}
+
+char* parse(char* line){
+    /*char *startPath = strchr(line, "/");
+    char *endPath = strchr(startPath, " ");
+    char path[endPath-startPath];
+    strncpy(path, startPath, endPath);
+    printf(path);
+    return path;*/
+    /* Find out where everything is */
+    const char *start_of_path = strchr(line, '/');
+    const char *end_of_path = strchr(start_of_path, ' ');
+    
+
+
+    /* Get the right amount of memory */
+    char path[end_of_path - start_of_path];
+
+    /*Copy the strings into our memory */
+    strncpy(path, start_of_path,  end_of_path - start_of_path);
+
+    /* Null terminators (because strncpy does not provide them) */
+    path[sizeof(path)] = 0;
+
+    /*Print */
+    printf("%s\n", path, sizeof(path));
+    return path;
+}
 //error function
 void error(const char *msg) { perror(msg); exit(1); }
 int main() {
@@ -55,20 +106,44 @@ int main() {
         n = read (newsockfd,buffer,sizeof(buffer)-1);
 
         if (n < 0) error("ERROR reading from socket");
-        snprintf (body, sizeof (body),
+        
+        const char *start_of_path = strchr(buffer, '/') +1;
+        const char *end_of_path = strchr(start_of_path, ' ');
+    
+
+
+        /* Get the right amount of memory */
+        char path[end_of_path - start_of_path];
+
+        /*Copy the strings into our memory */
+        strncpy(path, start_of_path,  end_of_path - start_of_path);
+
+        /* Null terminators (because strncpy does not provide them) */
+        path[sizeof(path)] = 0;
+        file_to_string(newsockfd, path);
+
+        /*Print */
+        printf("%s\n", path, sizeof(path));
+
+        printf("%s\n", body, sizeof(body));
+    
+        
+        /*snprintf (body, sizeof (body),
             "<html>\n<body>\n"
             "<h1>Hello web browser</h1>\nYour request was\n"
             "<pre>%s</pre>\n"
-            "</body>\n</html>\n", buffer);
-        snprintf (msg, sizeof (msg),
-            "HTTP/1.0 200 OK\n"
-            "Content-Type: text/html\n"
-            "Content-Length: %ld\n\n%s", strlen (body), body);
-
-        //Skrivel OK melding, og Hello
+            "</body>\n</html>\n", buffer);*/
+        
+            snprintf (msg, sizeof (msg),
+                "HTTP/1.0 200 OK\n"
+                "Content-Type: text/html\n"
+                "Content-Length: %ld\n\n%s", strlen (body), body);
+            n = write (newsockfd,msg,strlen(msg));
+        
+        //Skriver OK melding, og Hello
         
 
-        n = write (newsockfd,msg,strlen(msg));
+        
         if (n < 0) error("ERROR writing to socket");
         close (newsockfd);
         }
