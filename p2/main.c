@@ -91,6 +91,9 @@ void file_to_string(int sockfd, char *filepath, char *t) {
     else if (!strcmp(t, ".ico")){
         type = "image/x-icon";
     }
+    else if (!strcmp(t, ".pdf")) {
+        type = "application/pdf";
+    }
     else {
         type = "application/json";
     }
