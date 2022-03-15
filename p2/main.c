@@ -12,18 +12,32 @@
 #include <sys/ioctl.h>
 #include <netdb.h>
 #include <string.h>
+#include <sys/stat.h> // stat()
 
 
 //constants
 
 //not reserved
-#define PORT 7220
+#define PORT 7227
 
 #define MAXREQ (4096*1024)
 
 char buffer[MAXREQ], body[MAXREQ], msg[MAXREQ];
 
-void showerror(){
+void response (void *message, int msglen, int clientsocket)
+{
+    char *msg = (char*) message;
+
+    while (msglen > 0)
+    {
+         int len = write(clientsocket, msg, msglen);
+         if (len <= 0) return;
+         msg += len;
+         msglen -= len;
+    }
+}
+
+void showerror(int sockfd){
     FILE *fp = fopen("webroot/404error.html", "r");
     char ch;
 
@@ -33,46 +47,61 @@ void showerror(){
         
         exit(EXIT_FAILURE);
     }
-    int i = 0;
-    while(1) {
-        ch = fgetc(fp);
-        if (feof(fp)) {
-            break;
-        }
-        body[i] = ch;
-        i ++;
+    struct stat st;
+    stat("webroot/404error.html", &st);
+    sprintf(msg, "HTTP/1.0 404 Not Found\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", "text/html", st.st_size);
+    response(msg, strlen(msg), sockfd);
+    long ret; 
+    while ((ret = fread(body, 1, sizeof(body), fp)) > 0)  {
+        response(body, ret, sockfd); 
     }
-    body[i] = '\0';
     fclose(fp);
 }
 
-void file_to_string(int sockfd, char *filepath) {
+void file_to_string(int sockfd, char *filepath, char *t) {
     char *start = "webroot";
     char str[8+ strlen(filepath)];
     strcpy(str, start);
-    strcat(str, filepath);
+    if (strcmp(filepath, "/")) {
+        strcat(str, filepath);
+    }
+    else {
+        strcat(str, "/index.html");
+    }
+        
     printf(str);
-    printf("/n");
+    printf("\n");
     FILE *fp = fopen(str, "r");
     char ch;
 
     if (fp == NULL)
     {
         //perror("Error while opening the file.\n");
-        showerror();
+        showerror(sockfd);
         return;
         //exit(EXIT_FAILURE);
     }
-    int i = 0;
-    while(1) {
-        ch = fgetc(fp);
-        if (feof(fp)) {
-            break;
-        }
-        body[i] = ch;
-        i ++;
+    char *type;
+    if(!strcmp(t, ".html")){
+        type = "text/html";
     }
-    body[i] = '\0';
+    else if (!strcmp(t, ".jpg") || !strcmp(t, ".JPG")){
+        type = "image/jpeg";
+    }
+    else if (!strcmp(t, ".ico")){
+        type = "image/x-icon";
+    }
+    else {
+        type = "application/json";
+    }
+    struct stat st;
+    stat(str, &st);
+    sprintf(msg, "HTTP/1.0 200 OK\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", type, st.st_size);
+    response(msg, strlen(msg), sockfd);
+    long ret; 
+    while ((ret = fread(body, 1, sizeof(body), fp)) > 0)  {
+        response(body, ret, sockfd); 
+    }
     fclose(fp);
 }
 
@@ -142,13 +171,19 @@ int main() {
 
          /*Copy the strings into our memory */
         strncpy(path, start_of_path,  end_of_path - start_of_path);
+        const char *start_of_type = strchr(buffer, '.');
+        const char *end_of_type = strchr(start_of_type, ' ');
+        char t[end_of_type - start_of_type];
+        strncpy(t, start_of_type, end_of_type - start_of_type);
+        t[sizeof(t)] = 0;
+        printf("%s\n", t);
     
         /* Null terminators (because strncpy does not provide them) */
         path[sizeof(path)] = 0;
         /*Print */
 
         printf("%s\n", path, path);
-        file_to_string(newsockfd, path);
+        file_to_string(newsockfd, path, t);
 
     
 
@@ -159,14 +194,14 @@ int main() {
             "<html>\n<body>\n"
             "<h1>Hello web browser</h1>\nYour request was\n"
             "<pre>%s</pre>\n"
-            "</body>\n</html>\n", buffer);*/
+            "</body>\n</html>\n", buffer);
         
             snprintf (msg, sizeof (msg),
                 "HTTP/1.0 200 OK\n"
                 "Content-Type: text/html\n"
                 "Content-Length: %ld\n\n%s", strlen (body), body);
             n = write (newsockfd,msg,strlen(msg));
-        
+        */
         //Skriver OK melding, og Hello
         
 
