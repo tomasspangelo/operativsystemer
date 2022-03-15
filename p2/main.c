@@ -17,19 +17,20 @@
 //constants
 
 //not reserved
-#define PORT 7219
+#define PORT 7220
 
 #define MAXREQ (4096*1024)
 
 char buffer[MAXREQ], body[MAXREQ], msg[MAXREQ];
 
-void file_to_string(int sockfd, char *filepath) {
-    FILE *fp = fopen(filepath, "r");
+void showerror(){
+    FILE *fp = fopen("webroot/404error.html", "r");
     char ch;
 
     if (fp == NULL)
     {
         perror("Error while opening the file.\n");
+        
         exit(EXIT_FAILURE);
     }
     int i = 0;
@@ -45,15 +46,34 @@ void file_to_string(int sockfd, char *filepath) {
     fclose(fp);
 }
 
-char* parse(char* line){
-    /*char *startPath = strchr(line, "/");
-    char *endPath = strchr(startPath, " ");
-    char path[endPath-startPath];
-    strncpy(path, startPath, endPath);
-    printf(path);
-    return path;*/
-    /* Find out where everything is */
-    const char *start_of_path = strchr(line, '/');
+void file_to_string(int sockfd, char *filepath) {
+    FILE *fp = fopen(filepath, "r");
+    char ch;
+
+    if (fp == NULL)
+    {
+        //perror("Error while opening the file.\n");
+        showerror();
+        return;
+        //exit(EXIT_FAILURE);
+    }
+    int i = 0;
+    while(1) {
+        ch = fgetc(fp);
+        if (feof(fp)) {
+            break;
+        }
+        body[i] = ch;
+        i ++;
+    }
+    body[i] = '\0';
+    fclose(fp);
+}
+
+
+void parse(){
+    
+    const char *start_of_path = strchr(buffer, '/') +1;
     const char *end_of_path = strchr(start_of_path, ' ');
     
 
@@ -63,13 +83,12 @@ char* parse(char* line){
 
     /*Copy the strings into our memory */
     strncpy(path, start_of_path,  end_of_path - start_of_path);
-
+    
     /* Null terminators (because strncpy does not provide them) */
     path[sizeof(path)] = 0;
-
     /*Print */
-    printf("%s\n", path, sizeof(path));
-    return path;
+
+   
 }
 //error function
 void error(const char *msg) { perror(msg); exit(1); }
@@ -107,7 +126,7 @@ int main() {
 
         if (n < 0) error("ERROR reading from socket");
         
-        const char *start_of_path = strchr(buffer, '/') +1;
+         const char *start_of_path = strchr(buffer, '/') +1;
         const char *end_of_path = strchr(start_of_path, ' ');
     
 
@@ -115,17 +134,19 @@ int main() {
         /* Get the right amount of memory */
         char path[end_of_path - start_of_path];
 
-        /*Copy the strings into our memory */
+         /*Copy the strings into our memory */
         strncpy(path, start_of_path,  end_of_path - start_of_path);
-
+    
         /* Null terminators (because strncpy does not provide them) */
         path[sizeof(path)] = 0;
+        /*Print */
+
+        printf("%s\n", path, path);
         file_to_string(newsockfd, path);
 
-        /*Print */
-        printf("%s\n", path, sizeof(path));
+    
 
-        printf("%s\n", body, sizeof(body));
+       // printf("%s\n", body, sizeof(body));
     
         
         /*snprintf (body, sizeof (body),
