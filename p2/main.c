@@ -47,7 +47,13 @@ void showerror(){
 }
 
 void file_to_string(int sockfd, char *filepath) {
-    FILE *fp = fopen(filepath, "r");
+    char *start = "webroot";
+    char str[8+ strlen(filepath)];
+    strcpy(str, start);
+    strcat(str, filepath);
+    printf(str);
+    printf("/n");
+    FILE *fp = fopen(str, "r");
     char ch;
 
     if (fp == NULL)
@@ -126,7 +132,7 @@ int main() {
 
         if (n < 0) error("ERROR reading from socket");
         
-         const char *start_of_path = strchr(buffer, '/') +1;
+         const char *start_of_path = strchr(buffer, '/');
         const char *end_of_path = strchr(start_of_path, ' ');
     
 
