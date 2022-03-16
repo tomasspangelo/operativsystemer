@@ -15,7 +15,7 @@
 typedef struct SEM{
     volatile int val; //number of tokens
     pthread_mutex_t m;
-    pthread_cond_t c;
+    pthread_cond_t c; //conditigionflag
 } SEM;
 
 /* Creates a new semaphore.
