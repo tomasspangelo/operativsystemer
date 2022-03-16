@@ -1,6 +1,5 @@
 #include "sem.h"
-#include <errno.h>
-#include <pthread.h>
+
 //Defines the integer variable errno,which is set by system calls and some library functions in the
 //event of an error to indicate what went wrong.
 typedef struct SEM{
@@ -10,7 +9,7 @@ typedef struct SEM{
 } SEM;
 
 SEM *sem_init(int initVal){
-   SEM *sem = malloc(sizeof(SEM));
+   SEM* sem = malloc(sizeof(struct SEM));
    // The malloc() function allocates size bytes and returns a pointer
     //to the allocated memory.  The memory is not initialized. 
     sem->val = initVal;
@@ -21,13 +20,11 @@ SEM *sem_init(int initVal){
     //Free /destroy on error //vet ikke om fungerer slik?
     errno = pthread_mutex_init(&sem->m, NULL);
     if(!errno){
-        free(buffer);
         return NULL;
     }
     errno = pthread_cond_init(&sem->c, NULL);
     if(!errno){
         pthread_mutex_destroy(&sem->m);
-        free(buffer);
          return NULL;
     }
 
@@ -36,10 +33,26 @@ SEM *sem_init(int initVal){
 
 int sem_del(SEM *sem){
     //destroying
-    pthread_mutex_destroy(&sem->m);
-    pthread_cond_destroy(&sem->c);
+
+    //returns 0 errorNumber if not
+    int check;
+    check= pthread_mutex_destroy(&sem->m);
+    if(check != 0){
+        return -1;
+    }
+
+    
+    check = pthread_cond_destroy(&sem->c);
+    if(check != 0){
+        return -1;
+    }
     //deallocates the memory previously allocated by a call to calloc, malloc, or realloc.
+    //does not return any error
     free(sem);
+
+    return 1;
+
+    //TODO, return correct
 
 }
 
@@ -62,17 +75,22 @@ void P(SEM *sem){
         //condition variable cond (if any threads are blocked on cond).
         pthread_cond_signal(&sem->c);
     }
-    pthread_mutex_unlock(&sem->m),
+    pthread_mutex_unlock(&sem->m);
 }
 
 void V(SEM *sem){
     pthread_mutex_lock(&sem->m);
 
     //add 1
-    sem->val +=1:
+    sem->val +=1;
 
     if(sem->val >0){
         pthread_cond_signal(&sem->c);
     }
     pthread_mutex_unlock(&sem->m);
+}
+
+//slik at filen kan kjøre
+int main(){
+
 }
