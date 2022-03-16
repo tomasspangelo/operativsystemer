@@ -1,5 +1,6 @@
 #include "sem.h"
 #include <errno.h>
+#include <pthread.h>
 //Defines the integer variable errno,which is set by system calls and some library functions in the
 //event of an error to indicate what went wrong.
 
