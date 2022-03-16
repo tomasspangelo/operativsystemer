@@ -1,4 +1,7 @@
 #include "sem.h"
+#include <errno.h>
+//Defines the integer variable errno,which is set by system calls and some library functions in the
+//event of an error to indicate what went wrong.
 
 SEM *sem_init(int initVal){
    SEM *sem = malloc(sizeof(SEM));
@@ -10,13 +13,16 @@ SEM *sem_init(int initVal){
     }
 
     //Free /destroy on error //vet ikke om fungerer slik?
-    check = pthread_mutex_init(&sem->m, NULL);
-    if(!check){
+    errno = pthread_mutex_init(&sem->m, NULL);
+    if(!errno){
         free(buffer);
+        return NULL;
     }
-    check = pthread_cond_init(&sem->c, NULL);
-    if(!check){
+    errno = pthread_cond_init(&sem->c, NULL);
+    if(!errno){
         pthread_mutex_destroy(&sem->m);
+        free(buffer);
+         return NULL;
     }
 
     return sem;
