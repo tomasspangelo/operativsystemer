@@ -1,5 +1,6 @@
 #ifndef ____BBUFFER___H___
 #define ____BBUFFER___H___
+#include "sem.h"
 
 /*
  * Bounded Buffer implementation to manage int values that supports multiple 
@@ -13,7 +14,15 @@
  * ...you need to figure out the contents of struct BNDBUF yourself
  */
 
-typedef struct BNDBUF BNDBUF;
+typedef struct BNDBUF{
+    SEM *m; //mutual exclusion on shared data (the buffer itself, to ensure correct pointers end/start)
+    SEM *full; //buffer full (full -> val = number of full slots)
+    SEM *empty; //buffer empty (empyte -> val = number of empty slots)
+    int size; // size of buffer
+    int *buf; //pointer to contents of buffer
+    int end; // end of ring buffer
+    int start; // start of ring buffer
+} BNDBUF;
 
 /* Creates a new Bounded Buffer. 
  *

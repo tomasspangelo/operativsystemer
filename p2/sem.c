@@ -1,13 +1,5 @@
 #include "sem.h"
 
-//Defines the integer variable errno,which is set by system calls and some library functions in the
-//event of an error to indicate what went wrong.
-typedef struct SEM{
-    volatile int val; //number of tokens
-    pthread_mutex_t m;
-    pthread_cond_t c; //conditigionflag
-} SEM;
-
 SEM *sem_init(int initVal){
    SEM* sem = malloc(sizeof(struct SEM));
    // The malloc() function allocates size bytes and returns a pointer

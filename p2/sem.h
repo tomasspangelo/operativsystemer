@@ -14,7 +14,13 @@
 /* Opaque type of a semaphore. 
  * ...you need to figure out the contents of struct SEM yourself!
  */
-typedef struct SEM SEM;
+//Defines the integer variable errno,which is set by system calls and some library functions in the
+//event of an error to indicate what went wrong.
+typedef struct SEM{
+    volatile int val; //number of tokens
+    pthread_mutex_t m;
+    pthread_cond_t c; //conditigionflag
+} SEM;
 
 /* Creates a new semaphore.
  *

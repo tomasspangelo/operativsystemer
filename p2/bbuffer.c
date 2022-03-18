@@ -4,17 +4,6 @@
 
 #define MAX_BUFFER_SIZE 5
 
-
-typedef struct BNDBUF{
-    SEM *m; //mutual exclusion on shared data (the buffer itself, to ensure correct pointers end/start)
-    SEM *full; //buffer full (full -> val = number of full slots)
-    SEM *empty; //buffer empty (empyte -> val = number of empty slots)
-    int size; // size of buffer
-    int *buf; //pointer to contents of buffer
-    int end; // end of ring buffer
-    int start; // start of ring buffer
-} BNDBUF;
-
 BNDBUF *bb_init(unsigned int size){
     printf("helloBB\n");
     // Check if size is ok (should have at least 1 element).
