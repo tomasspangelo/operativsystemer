@@ -17,5 +17,6 @@
 #include <sys/stat.h> // stat()
 
 void *work(void *ptr);
+void error(const char *msg);
 
 #endif
