@@ -89,8 +89,3 @@ void V(SEM *sem){
     }
     pthread_mutex_unlock(&sem->m);
 }
-
-//slik at filen kan kjøre
-int main(){
-
-}
