@@ -67,6 +67,7 @@ void file_to_string(int sockfd, char *filepath, char *t) {
     }
     else {
         strcat(str, "/index.html");
+        t = ".html"
     }
         
     printf(str);
