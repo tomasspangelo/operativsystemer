@@ -18,7 +18,7 @@
 //constants
 
 //not reserved
-#define PORT 7227
+#define PORT 7229
 
 #define MAXREQ (4096*1024)
 
@@ -67,7 +67,7 @@ void file_to_string(int sockfd, char *filepath, char *t) {
     }
     else {
         strcat(str, "/index.html");
-        t = ".html"
+        t = ".html";
     }
         
     printf(str);

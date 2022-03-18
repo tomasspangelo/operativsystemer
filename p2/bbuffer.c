@@ -14,7 +14,7 @@ typedef struct BNDBUF{
 
 BNDBUF *bb_init(unsigned int size){
     if (size < 0 || size > BUFFER_SIZE)
-        return printf("Error. Buffer not made");
+        return NULL;
 
     return bb_init;
 }
