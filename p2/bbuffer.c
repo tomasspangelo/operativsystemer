@@ -60,42 +60,50 @@ BNDBUF *bb_init(unsigned int size){
     return bndbuf;
 }
 
-
+// Delete buffer
 void bb_del(BNDBUF *bb){
+    // Delete binary sephamore
     if (bb->m != NULL){
         sem_del(bb -> m);
     }
+
+    // Delete empty sephamore
     if (bb->empty != NULL){
         sem_del(bb->empty);
     }
+
+    // Delete full sephamore
     if (bb->full != NULL){
         sem_del(bb->full);
     }
+    // Free memory allocated for buffer data
     free(bb -> buf);
+
+    // Free memory allocated for buffer
     free(bb);
 }
 
-
+// For consumers
 int  bb_get(BNDBUF *bb){
-    P(bb->full);
-    P(bb->m);
+    P(bb->full); // wait if there are no full slots
+    P(bb->m); // get access to data/pointers
 
-    int item = (bb -> buf)[bb->start++];
+    int fd = (bb -> buf)[bb->start++]; // get fd from buffer and increment start
     bb->start %= bb-> size;
 
-    V(bb->m);
-    V(bb->empty);
-    return item;
+    V(bb->m); // finished with data/pointers
+    V(bb->empty); // Signal that there is one more empty slot
+    return fd;
 }
 
-
+// For producers
 void bb_add(BNDBUF *bb, int fd){
-    P(bb -> empty);
-    P(bb -> m);
+    P(bb -> empty); // wait if there are no empty slots
+    P(bb -> m); // get access to data/pointers
 
-    (bb -> buf)[bb->end++] = fd;
+    (bb -> buf)[bb->end++] = fd; // add fd to buffer and increment end
     bb->end %= bb -> size;
 
-    V(bb -> m);
-    V(bb -> full);
+    V(bb -> m); // finished with data/pointers
+    V(bb -> full); // signal that there is one more full slot
 }
