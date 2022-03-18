@@ -16,24 +16,26 @@ typedef struct BNDBUF{
 } BNDBUF;
 
 BNDBUF *bb_init(unsigned int size){
+    printf("helloBB\n");
     // Check if size is ok (should have at least 1 element).
     if (size < 1 || size > MAX_BUFFER_SIZE)
         return NULL;
-    
+    printf("helloBB\n");
     // Allocate memory for BNDBUF (and check if OK)
     BNDBUF *bndbuf = malloc(sizeof(BNDBUF));
     if (bndbuf == NULL) {
         bb_del(bndbuf);
         return NULL;
     }
-
+    printf("helloBB\n");
     // Init full sephamore
     bndbuf->full = sem_init(0);
     if (bndbuf->full == NULL){
+        printf("erroromg\n");
         bb_del(bndbuf);
         return NULL;
     }
-
+    printf("helloBB\n");
     // Init empty sephamore
     bndbuf->empty = sem_init(size);
     if (bndbuf->empty == NULL){

@@ -19,15 +19,15 @@ SEM *sem_init(int initVal){
 
     //Free /destroy on error //vet ikke om fungerer slik?
     errno = pthread_mutex_init(&sem->m, NULL);
-    if(!errno){
+    if(errno){
         return NULL;
     }
     errno = pthread_cond_init(&sem->c, NULL);
-    if(!errno){
+    if(errno){
         pthread_mutex_destroy(&sem->m);
          return NULL;
     }
-
+    printf("Dette funka jo!\n");
     return sem;
 }
 
