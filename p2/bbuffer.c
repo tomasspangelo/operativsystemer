@@ -1,6 +1,6 @@
 #include "bbuffer.h"
 #include "sem.h"
-
+#include <stdio.h>
 
 #define MAX_BUFFER_SIZE 5
 
