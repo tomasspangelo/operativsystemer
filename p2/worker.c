@@ -41,7 +41,7 @@ void showerror(int sockfd, char *buffer){
     stat("webroot/404error.html", &st);
 
     // Write header to socket
-    sprintf(buffer, "HTTP/1.0 404 Not Found\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", "text/html", st.st_size);
+    sprintf(buffer, "HTTP/0.9 404 Not Found\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", "text/html", st.st_size);
     response(buffer, strlen(buffer), sockfd);
 
     // Write body to socket
@@ -107,8 +107,12 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer) {
     else if (!strcmp(t, ".pdf")) {
         type = "application/pdf";
     }
-    else {
+    else if (!strcmp(t, ".json")){
         type = "application/json";
+    }
+    else {
+        showerror(sockfd, buffer);
+        return;
     }
 
     // use stat() system call to get length of file
@@ -116,7 +120,7 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer) {
     stat(str, &st);
 
     // Write header to socket
-    sprintf(buffer, "HTTP/1.0 200 OK\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", type, st.st_size);
+    sprintf(buffer, "HTTP/0.9 200 OK\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", type, st.st_size);
     response(buffer, strlen(buffer), sockfd);
 
     // Write body to socket
