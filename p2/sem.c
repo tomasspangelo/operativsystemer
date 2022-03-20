@@ -1,14 +1,4 @@
-#include <stdio.h>
-#include <stdatomic.h>
-#include <pthread.h>
 #include "sem.h"
-
-struct SEM
-{
-    pthread_mutex_t lock;
-    pthread_cond_t condition;
-    int resource;
-};
 
 SEM* sem_init(int initVal)
 {

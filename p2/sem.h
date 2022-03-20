@@ -1,5 +1,8 @@
 #ifndef SEM_H
 #define SEM_H
+#include <stdio.h>
+#include <stdatomic.h>
+#include <pthread.h>
 /*
  * Semaphore implementation for the synchronization of POSIX threads.
  *
@@ -14,9 +17,9 @@
 //Defines the integer variable errno,which is set by system calls and some library functions in the
 //event of an error to indicate what went wrong.
 typedef struct SEM{
-    volatile int val; //number of tokens
-    pthread_mutex_t m;
-    pthread_cond_t c; //conditigionflag
+    pthread_mutex_t lock;
+    pthread_cond_t condition;
+    int resource;
 } SEM;
 
 /* Creates a new semaphore.

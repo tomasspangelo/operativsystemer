@@ -47,7 +47,7 @@ int main() {
         }
     //open port and accept connections
     printf("FY FAEN I HELVETE\n");
-    listen(sockfd,5);
+    listen(sockfd,THREADS);
     for (int i = 0; i < THREADS; i++) {
         irets[i] = pthread_create(&(threads[i]), NULL, &work, (void*) bb);
     }
