@@ -1,6 +1,6 @@
 #include "worker.h"
 #include "bbuffer.h"
-#define MAXREQ (4096*1024)
+#define MAXREQ (1024)
 
 void response (void *message, int msglen, int clientsocket)
 {
@@ -90,6 +90,7 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer) {
 void error(const char *msg) { perror(msg); exit(1); }
 
 void *work(void *ptr){
+    printf("hello thread\n");
     BNDBUF *bb = (BNDBUF*) ptr;
     char buffer[MAXREQ];
     while(1){

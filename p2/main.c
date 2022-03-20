@@ -17,7 +17,7 @@
 
 //constants
 //not reserved
-#define PORT 7229
+#define PORT 7237
 #define THREADS 4
 
 int main() {
@@ -47,10 +47,15 @@ int main() {
     //open port and accept connections
     printf("FY FAEN I HELVETE\n");
     listen(sockfd,5);
+    
     for (int i = 0; i < THREADS; i++) {
-        irets[i] = pthread_create(&(threads[i]), NULL, &work, (void*) bb);
+        irets[i] = pthread_create(&(threads[i]), NULL, work, (void*) bb);
     }
-
+    /*
+    for (int i = 0; i < THREADS; i++)
+    {
+        pthread_join(threads[i], NULL);
+    }*/
     printf("FY FAEN I HELVETE\n");
     while (1) {
         printf("INSH ALLAH0\n");
@@ -62,5 +67,8 @@ int main() {
         printf("HELVETE\n");
         if (newsockfd < 0) error("ERROR on accept");
         bb_add(bb, newsockfd);
+        for (int i = 0; i<THREADS; i++){
+            printf("CONTENT IN BUFFER: %d\n", bb->buf[i]);
+        }
     }
 }
