@@ -1,8 +1,5 @@
 #ifndef SEM_H
 #define SEM_H
-#include <errno.h>
-#include <pthread.h>
-#include <stdlib.h>
 /*
  * Semaphore implementation for the synchronization of POSIX threads.
  *

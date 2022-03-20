@@ -17,10 +17,11 @@
 
 //constants
 //not reserved
-#define PORT 7229
+#define PORT 7230
 #define THREADS 4
 
 int main() {
+    printf("kul");
     pthread_t threads[THREADS];
     int irets[THREADS];
     BNDBUF *bb = bb_init(THREADS);
@@ -59,7 +60,7 @@ int main() {
         printf("INSH ALLAH\n");
         newsockfd = accept (sockfd, (struct sockaddr *) &cli_addr,
         &clilen);
-        printf("HELVETE\n");
+        printf("HELVETE2222\n");
         if (newsockfd < 0) error("ERROR on accept");
         bb_add(bb, newsockfd);
     }
