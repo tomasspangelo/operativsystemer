@@ -1,4 +1,5 @@
 #include "sem.h"
+#include <stdio.h>
 
 SEM *sem_init(int initVal){
    SEM* sem = malloc(sizeof(struct SEM));
