@@ -20,14 +20,12 @@ SEM *sem_init(int initVal){
     }
 
     //Free /destroy on error //vet ikke om fungerer slik?
-    errno = pthread_mutex_init(&sem->m, NULL);
-    if(errno){
+    if(pthread_mutex_init(&sem->m, NULL)){
         return NULL;
     }
-    errno = pthread_cond_init(&sem->c, NULL);
-    if(errno){
-        pthread_mutex_destroy(&sem->m);
-         return NULL;
+    
+    if(pthread_mutex_destroy(&sem->m)){
+        return NULL;
     }
     return sem;
 }
@@ -35,16 +33,12 @@ SEM *sem_init(int initVal){
 int sem_del(SEM *sem){
     //destroying
 
-    //returns 0 errorNumber if not
-    int check;
-    check= pthread_mutex_destroy(&sem->m);
-    if(check != 0){
+
+    if(pthread_mutex_destroy(&sem->m) != 0){
         return -1;
     }
 
-    
-    check = pthread_cond_destroy(&sem->c);
-    if(check != 0){
+    if(pthread_mutex_destroy(&sem->m) != 0){
         return -1;
     }
     //deallocates the memory previously allocated by a call to calloc, malloc, or realloc.
