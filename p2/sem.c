@@ -1,5 +1,14 @@
 #include "sem.h"
 #include <stdio.h>
+#include <errno.h>
+#include <pthread.h>
+#include <stdlib.h>
+
+typedef struct SEM{
+    volatile int val; //number of tokens
+    pthread_mutex_t m;
+    pthread_cond_t c; //conditigionflag
+} SEM;
 
 SEM *sem_init(int initVal){
    SEM* sem = malloc(sizeof(struct SEM));
@@ -20,7 +29,6 @@ SEM *sem_init(int initVal){
         pthread_mutex_destroy(&sem->m);
          return NULL;
     }
-    printf("Dette funka jo!\n");
     return sem;
 }
 

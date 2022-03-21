@@ -30,7 +30,6 @@ int main() {
 
     // Initialize bounded ring buffer
     BNDBUF *bb = bb_init(THREADS);
-    printf("%d\n", bb -> size);
 
     // Decklare socket variables
     int sockfd, newsockfd;

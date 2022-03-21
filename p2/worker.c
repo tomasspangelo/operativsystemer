@@ -3,7 +3,9 @@
 
 //Maxmim buffer size for a worker thread
 #define MAXREQ (1024)
-
+#define HTTP_VERSION (1)
+// HTTP_VERSION=0: HTTP/0.9
+// HTTP_VERSION=1: HTTP/1.0
 /*
 Write the response to the socket indicated by the file descriptor
 sockfd.
@@ -41,8 +43,11 @@ void showerror(int sockfd, char *buffer){
     stat("webroot/404error.html", &st);
 
     // Write header to socket
-    sprintf(buffer, "HTTP/0.9 404 Not Found\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", "text/html", st.st_size);
-    response(buffer, strlen(buffer), sockfd);
+    if (HTTP_VERSION){
+        sprintf(buffer, "HTTP/1.0 404 Not Found\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", "text/html", st.st_size);
+        response(buffer, strlen(buffer), sockfd);
+    }
+    
 
     // Write body to socket
     // Note: will take multiple iterations if filesize is larger than buffer
@@ -63,6 +68,12 @@ filepath: string indicating path to requested file
 buffer: pointer to start of buffer
 */
 void process_request(int sockfd, char *filepath, char *t, char* buffer) {
+    // Erase content in buffer
+
+     if (!HTTP_VERSION && strcmp(t, ".html"))  {
+        showerror(sockfd, buffer);
+        return;
+    }
 
     // Start of path
     char *start = "webroot";
@@ -80,9 +91,6 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer) {
         t = ".html";
     }
         
-    printf(str);
-    printf("\n");
-
     //Open file
     FILE *fp = fopen(str, "r");
 
@@ -119,10 +127,13 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer) {
     struct stat st;
     stat(str, &st);
 
-    // Write header to socket
-    sprintf(buffer, "HTTP/0.9 200 OK\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", type, st.st_size);
-    response(buffer, strlen(buffer), sockfd);
-
+    // Write header to socket (if HTTP_VERSION==0)
+    // Workes with curl --http0.9
+    if(HTTP_VERSION){
+        sprintf(buffer, "HTTP/1.0 200 OK\r\nContent-Type: %s\r\nContent-Length: %lld\r\n\r\n", type, st.st_size);
+        response(buffer, strlen(buffer), sockfd);
+    }
+    
     // Write body to socket
     // Note: will take multiple iterations if filesize is larger than buffer
     long ret; 
@@ -141,7 +152,6 @@ void error(const char *msg) { perror(msg); exit(1); }
 ptr: pointer to bounded ring buffer
 */
 void *work(void *ptr){
-    printf("hello thread\n");
 
     // Cast ptr to pointer to a bounded ring buffer
     BNDBUF *bb = (BNDBUF*) ptr;
@@ -152,15 +162,14 @@ void *work(void *ptr){
         // get file descriptor from bounded ring buffer
         int fd = bb_get(bb);
 
-        // Erase content in buffer
-        bzero(buffer,sizeof(buffer));
-
         // Read request (from file descriptor)
         int n = read(fd,buffer,sizeof(buffer)-1);
 
         // If error
         if (n < 0) error("ERROR reading from socket");
-        
+
+        printf("%s\n", buffer);        
+       
         // Find start and end of path in request
         const char *start_of_path = strchr(buffer, '/');
         const char *end_of_path = strchr(start_of_path, ' ');
@@ -180,10 +189,6 @@ void *work(void *ptr){
         strncpy(t, start_of_type, end_of_type - start_of_type);
         // Null terminators (because strncpy does not provide them)
         t[sizeof(t)] = 0;
-
-        // Print
-        printf("%s\n", t);
-        printf("%s\n", path, path);
 
         // Process request
         process_request(fd, path, t, buffer);
