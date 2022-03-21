@@ -3,7 +3,7 @@
 
 //Maxmim buffer size for a worker thread
 #define MAXREQ (1024)
-#define HTTP_VERSION (1)
+#define HTTP_VERSION (0)
 // HTTP_VERSION=0: HTTP/0.9
 // HTTP_VERSION=1: HTTP/1.0
 /*
@@ -68,12 +68,6 @@ filepath: string indicating path to requested file
 buffer: pointer to start of buffer
 */
 void process_request(int sockfd, char *filepath, char *t, char* buffer) {
-    // Erase content in buffer
-
-     if (!HTTP_VERSION && strcmp(t, ".html"))  {
-        showerror(sockfd, buffer);
-        return;
-    }
 
     // Start of path
     char *start = "webroot";
@@ -89,6 +83,11 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer) {
     else {
         strcat(str, "/index.html");
         t = ".html";
+    }
+
+     if (!HTTP_VERSION && strcmp(t, ".html"))  {
+        showerror(sockfd, buffer);
+        return;
     }
         
     //Open file
@@ -166,13 +165,22 @@ void *work(void *ptr){
         int n = read(fd,buffer,sizeof(buffer)-1);
 
         // If error
-        if (n < 0) error("ERROR reading from socket");
+        if (n < 0) {
+            continue;
+        };
 
         printf("%s\n", buffer);        
        
         // Find start and end of path in request
         const char *start_of_path = strchr(buffer, '/');
         const char *end_of_path = strchr(start_of_path, ' ');
+        /*
+        char *end_of_path;
+        for (int i = 0; i<buffer - start_of_path; i++){
+            if (isspace(start_of_path[i])){
+                end_of_path = &start_of_path[i];
+            }
+        }*/
         // Get the right amount of memory
         char path[end_of_path - start_of_path];
         // Copy the path into our memory 

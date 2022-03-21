@@ -16,7 +16,7 @@
 #include "sem.h"
 
 // Constants
-#define PORT 7238 // Port number
+#define PORT 7248 // Port number
 #define THREADS 4 // Number of threads
 #define MAXQUEUE 5 //Maximum queue of requests before rejecting
 

@@ -23,7 +23,8 @@ SEM *sem_init(int initVal){
         return NULL;
     }
     
-    if(pthread_mutex_destroy(&sem->m)){
+    if(pthread_cond_init(&sem->c, NULL)){
+        pthread_mutex_destroy(&sem->m);
         return NULL;
     }
     return sem;
@@ -37,7 +38,7 @@ int sem_del(SEM *sem){
         return -1;
     }
 
-    if(pthread_mutex_destroy(&sem->m) != 0){
+    if(pthread_cond_destroy(&sem->c) != 0){
         return -1;
     }
     //deallocates the memory previously allocated by a call to calloc, malloc, or realloc.
@@ -64,11 +65,6 @@ void P(SEM *sem){
     //decrement
     sem->val -=1;
     //wake waiting thread
-    if(sem->val >0){
-        //function shall unblock at least one of the threads that are blocked on the specified 
-        //condition variable cond (if any threads are blocked on cond).
-        pthread_cond_signal(&sem->c);
-    }
     pthread_mutex_unlock(&sem->m);
 }
 
