@@ -80,7 +80,7 @@ void process_request(int sockfd, char *filepath, char *t, char* buffer, char *st
     }
 
     // Get correct media type for response header
-    // Assumes the request-path hat no . after root other then the filename
+    // Assumes the request-path has no '.' other then the filename extension
     char *type;
     if(!strcmp(t, ".html")){
         type = "text/html";
