@@ -84,20 +84,12 @@ void bb_del(BNDBUF *bb){
 // For consumers
 int  bb_get(BNDBUF *bb){
     P(bb->full); // wait if there are no full slots
-    //P(bb->m); // get access to data/pointers
-
-    printf("Buffer start: %d\n", bb->start);
-    printf("Buffer end: %d\n", bb->end);
-    printf("ID: %d\n", pthread_self());
+    P(bb->m); // get access to data/pointers
 
     int fd = (bb -> buf)[bb->start++]; // get fd from buffer and increment start
     bb->start %= bb-> size;
 
-    printf("Buffer start: %d\n", bb->start);
-    printf("Buffer end: %d\n", bb->end);
-    printf("ID: %d\n", pthread_self());
-
-    //V(bb->m); // finished with data/pointers
+    V(bb->m); // finished with data/pointers
     V(bb->empty); // Signal that there is one more empty slot
     return fd;
 }
