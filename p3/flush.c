@@ -13,8 +13,5 @@ void printFilepath( char *path ){
 
 int main(void) {
     char path[MAX_PATH];
-
     printFilepath(path);
-
-    //return 0;
 }
