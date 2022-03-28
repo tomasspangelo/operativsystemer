@@ -31,10 +31,13 @@ int main(void) {
     printf("Does it work?");
     //system(str);
 
-    
+    //char commanName[MAX_PATH];
+    //char arguments[MAX_PATH];
+    //int i = 0;
     while( (found = strsep(&str," ")) != NULL ){
         printf("Her kommer det");
         printf("%s\n",found);
+        
     }
    
         
