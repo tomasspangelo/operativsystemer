@@ -32,26 +32,28 @@ pid_t create_process() {
     } 
     //Parent wait
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
+    //returns true if the child terminated normally,
     if (WIFEXITED(status)) {
-            printf("Exit status[%s%s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
-            } else if (WIFSIGNALED(status)) {
-                printf("killed by signal %d\n", WTERMSIG(status));
-            } else if (WIFSTOPPED(status)) {
-                printf("stopped by signal %d\n", WSTOPSIG(status));
-            } else if (WIFCONTINUED(status)) {
-                printf("continued\n");
-            }
+        printf("Exit status[%s%s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
+    //returns true if the child process was terminated by a signal.
+    } else if (WIFSIGNALED(status)) {
+        printf("killed by signal %d\n", WTERMSIG(status));
+    //returns true if the child process was stopped by delivery of a signal
+    } else if (WIFSTOPPED(status)) {
+        printf("stopped by signal %d\n", WSTOPSIG(status));}
     return pid;
     
 }
 
 
 int main(void) {
-    
+    char str[MAX_PATH];
     char path[MAX_PATH];
     printFilepath(path);
-    char str[MAX_PATH];
     scanf("%[^\n]%*c", str);
+    int flag=0;
+
+    while(flag != EOF ){
     //printf("%s", str);
 
 
@@ -75,9 +77,13 @@ int main(void) {
     }
     create_process();
 
+    char path[MAX_PATH];
+    printFilepath(path);
+    flag = scanf("%[^\n]%*c", str);
+
     //system(str);
 
-   
+    }
         
 
     return(0);
