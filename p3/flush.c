@@ -10,6 +10,7 @@
 #define MAX_PATH 200
 int size;
 char argv[MAX_PATH][MAX_PATH];
+char path[MAX_PATH];
 
 // The entered
 // text is split into command name and arguments. Arguments are separated from each other and from the command
@@ -28,26 +29,35 @@ pid_t create_process() {
 
 
     if (pid == 0) {
-        if(size == 2){
+
+        if(size == 2 && strcmp(argv[0],"cd")){
             execl(argv[0],argv[0],argv[1], (char*) NULL);
         }
-        else if(size == 1){
+        else if(size == 1 && strcmp(argv[0],"cd")){
             execl(argv[0],argv[0], (char*) NULL);
         }
-      
         exit(0);
     } 
+
+    //Gjør det i parrent så det er mulig å endre faktisk
+     if(!strcmp(argv[0],"cd")){
+            chdir(argv[1]);
+            getcwd(path, MAX_PATH);
+            //printFilepath(path);
+    }
+    //wait(0);
     //Parent wait
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
     //returns true if the child terminated normally,
     if (WIFEXITED(status)) {
-        printf("Exit status[%s%s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
+        printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
     //returns true if the child process was terminated by a signal.
     } else if (WIFSIGNALED(status)) {
         printf("killed by signal %d\n", WTERMSIG(status));
     //returns true if the child process was stopped by delivery of a signal
     } else if (WIFSTOPPED(status)) {
         printf("stopped by signal %d\n", WSTOPSIG(status));}
+  
     return pid;
     
 }
@@ -55,9 +65,10 @@ pid_t create_process() {
 
 int main(void) {
     char str[MAX_PATH];
-    char path[MAX_PATH];
     //execl("/bin/ls","/bin/ls",  (char*) NULL);
     printFilepath(path);
+    //chdir("..");
+    //printFilepath(path);
     scanf("%[^\n]%*c", str);
     int flag=0;
 
@@ -85,8 +96,8 @@ int main(void) {
     }
     create_process();
 
-    char path[MAX_PATH];
-    printFilepath(path);
+   
+    printf("%s:\n", path);
     flag = scanf("%[^\n]%*c", str);
 
     //system(str);
