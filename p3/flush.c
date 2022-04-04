@@ -22,8 +22,7 @@ pid_t create_process() {
        
     pid = fork();
     if (pid == 0) {
-        execl(argv[0], argv[1]);
-        printf("Den gjorde det\n");
+        execl(argv[0],argv[0], argv[1],  (char*) NULL);
         exit(0);
     } 
     return pid;
@@ -32,17 +31,19 @@ pid_t create_process() {
 
 
 int main(void) {
+    
     char path[MAX_PATH];
     printFilepath(path);
     char str[MAX_PATH];
     scanf("%[^\n]%*c", str);
-    printf("%s", str);
+    //printf("%s", str);
+
 
     char *found;
     
-    printf("Original string: '%s'\n",str);
+    //printf("Original string: '%s'\n",str);
 
-    printf("Does it work?\n");
+    //printf("Does it work?\n");
     //system(str);
 
     char *tok =str, *end = str;
@@ -51,14 +52,14 @@ int main(void) {
         strsep(&end, " ");
         found = tok;
         strcpy(argv[i], tok);
-        printf("Her kommer det\n");
-        printf("%s\n",argv[i]);
+        //printf("Her kommer det\n");
+        //printf("%s\n",argv[i]);
         tok = end;
         i++;
     }
     create_process();
 
-    system(str);
+    //system(str);
 
    
         
