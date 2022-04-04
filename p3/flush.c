@@ -8,6 +8,7 @@
 
 
 #define MAX_PATH 200
+int size;
 char argv[MAX_PATH][MAX_PATH];
 
 // The entered
@@ -27,7 +28,13 @@ pid_t create_process() {
 
 
     if (pid == 0) {
-        execl(argv[0],argv[0], argv[1], (char*) NULL);
+        if(size == 2){
+            execl(argv[0],argv[0],argv[1], (char*) NULL);
+        }
+        else if(size == 1){
+            execl(argv[0],argv[0], (char*) NULL);
+        }
+      
         exit(0);
     } 
     //Parent wait
@@ -49,6 +56,7 @@ pid_t create_process() {
 int main(void) {
     char str[MAX_PATH];
     char path[MAX_PATH];
+    //execl("/bin/ls","/bin/ls",  (char*) NULL);
     printFilepath(path);
     scanf("%[^\n]%*c", str);
     int flag=0;
@@ -65,15 +73,15 @@ int main(void) {
     //system(str);
 
     char *tok =str, *end = str;
-    int i = 0;
+    size = 0;
     while( tok != NULL ){
         strsep(&end, " ");
         found = tok;
-        strcpy(argv[i], tok);
+        strcpy(argv[size], tok);
         //printf("Her kommer det\n");
         //printf("%s\n",argv[i]);
         tok = end;
-        i++;
+        size++;
     }
     create_process();
 
