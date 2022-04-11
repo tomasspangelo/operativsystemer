@@ -74,7 +74,7 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
     }
 
     // If it is a background process, add to stack
-    if (!strcmp(argv[size], "&")){
+    if (!strcmp(argv[size - 1], "&")){
         add_process(p, pid, path, index_stack, top);
         return pid;
     } 
