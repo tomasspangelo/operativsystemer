@@ -48,11 +48,13 @@ pid_t create_process() {
             else if(!strcmp(argv[i],">")){
                int fd;
 
-                fd = open("test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+                fd = open(argv[i+1], O_WRONLY | O_CREAT | O_TRUNC, 0666);
 
                 if (dup2(fd, 1) < 0) { perror("dup2"); exit(1); }
 
-                 printf("Standard output now goes to file4\n");
+                 printf("Standard output now goes to \n");
+
+                 size = size - 2;
 
                  close(fd);
             }    
