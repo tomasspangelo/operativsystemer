@@ -28,44 +28,34 @@ pid_t create_process() {
     int status;
     pid = fork();
 
-
     if (pid == 0) {
-        for(int i = 0; i<size; ++i){
+        char *clean_argv[size+1];
+        int index = 0;
+        for(int i = 0; i<size; i++){
 
+            // looking for input character
             if(!strcmp(argv[i],"<")){
-                FILE *fp;
-                char buff[255];
-
-                fp = fopen(argv[i+1], "r");
-
-                while (fscanf(fp, "%[^\n] ", buff) != EOF) {
-                    printf(" %s\n", buff);
-                }
-                fclose(fp);  
+                ++i;
+                int fd;
+                fd = open(argv[i], O_RDONLY);
+                dup2(fd, STDIN_FILENO); // duplicate stdin to input file
+                close(fd);
+                continue;  
             }  
 
-            //Rederict standard output to the file
-            else if(!strcmp(argv[i],">")){
-               int fd;
-
-                fd = open(argv[i+1], O_WRONLY | O_CREAT | O_TRUNC, 0666);
-
-                if (dup2(fd, 1) < 0) { perror("dup2"); exit(1); }
-
-                 printf("Standard output now goes to \n");
-
-                 size = size - 2;
-
-                 close(fd);
-            }    
+            // looking for output character
+            if(!strcmp(argv[i],">")){
+                ++i;
+                int fd;
+                fd = creat(argv[i], 0644); // create a new file or rewrite an existing one
+                dup2(fd, STDOUT_FILENO); // redirect stdout to file
+                close(fd); 
+                continue;
+            } 
+        clean_argv[index++] = argv[i];    
         }
-
-        if(size == 2 && strcmp(argv[0],"cd")){
-            execl(argv[0],argv[0],argv[1], (char*) NULL);
-        }
-        else if(size == 1 && strcmp(argv[0],"cd")){
-            execl(argv[0],argv[0], (char*) NULL);
-        }
+        clean_argv[index] = NULL;
+        execvp(clean_argv[0], clean_argv); 
         exit(0);
     } 
 
