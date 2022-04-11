@@ -7,8 +7,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 
-
-#define MAX_PATH 200
+#define MAX_BACKGROUND 10
 int size;
 char argv[MAX_PATH][MAX_PATH];
 char path[MAX_PATH];
@@ -22,7 +21,22 @@ void printFilepath( char *path ){
     printf("%s:\n", path);
 }
 
-pid_t create_process() {
+void add_process(struct Process *p, pid_t pid, char* command, int *index_stack, int *top) {
+    struct Process new_process;
+    strcpy(new_process.command, command);
+    new_process.active = 1;
+    new_process.process_id = pid;
+    p[index_stack[*top]] = new_process;
+    (*top) --;
+}
+
+void remove_process(struct Process *p, int index, int *index_stack, int *top) {
+    p[index].active = 0;
+    (*top) ++;
+    index_stack[*top] = index;
+}
+
+pid_t create_process(struct Process *p, int *index_stack, int *top) {
     pid_t pid;
     pid_t cpid, w;
     int status;
@@ -57,6 +71,12 @@ pid_t create_process() {
         clean_argv[index] = NULL;
         execvp(clean_argv[0], clean_argv); 
         exit(0);
+    }
+
+    // If it is a background process, add to stack
+    if (!strcmp(argv[size], "&")){
+        add_process(p, pid, path, index_stack, top);
+        return pid;
     } 
 
     //Gjør det i parrent så det er mulig å endre faktisk
@@ -86,7 +106,12 @@ pid_t create_process() {
 
 int main(void) {
  
-
+    struct Process processes[MAX_BACKGROUND];
+    int index_stack[MAX_BACKGROUND];
+    for (int i = 0; i < MAX_BACKGROUND; i++) {
+        index_stack[i] = MAX_BACKGROUND - i - 1;
+    }
+    int top = MAX_BACKGROUND - 1;
 
     char str[MAX_PATH];
     //execl("/bin/ls","/bin/ls",  (char*) NULL);
@@ -118,7 +143,32 @@ int main(void) {
         tok = end;
         size++;
     }
-    create_process();
+    create_process(processes, index_stack, top);
+
+    //TODO: Clean up processes
+    for (int i = MAX_BACKGROUND - 1; i > top; i--) {
+        //wait(0);
+        //Parent wait
+        int status;
+        int w = waitpid(processes[i].process_id, &status, WNOHANG);
+
+        // If not finished -> continue
+        if (w == 0) {
+            continue;
+        }
+         //returns true if the child terminated normally,
+        if (WIFEXITED(status)) {
+            //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
+            printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
+        //returns true if the child process was terminated by a signal.
+        } else if (WIFSIGNALED(status)) {
+            printf("killed by signal %d\n", WTERMSIG(status));
+        //returns true if the child process was stopped by delivery of a signal
+        } else if (WIFSTOPPED(status)) {
+            printf("stopped by signal %d\n", WSTOPSIG(status));}
+        remove_process(processes, i, index_stack, top);
+        
+    }
 
    
     printf("%s:\n", path);
