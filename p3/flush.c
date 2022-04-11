@@ -5,6 +5,7 @@
 #include "flush.h"
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
 
 
 #define MAX_PATH 200
@@ -29,6 +30,33 @@ pid_t create_process() {
 
 
     if (pid == 0) {
+        for(int i = 0; i<size; ++i){
+
+            if(!strcmp(argv[i],"<")){
+                FILE *fp;
+                char buff[255];
+
+                fp = fopen(argv[i+1], "r");
+
+                while (fscanf(fp, "%[^\n] ", buff) != EOF) {
+                    printf(" %s\n", buff);
+                }
+                fclose(fp);  
+            }  
+
+            //Rederict standard output to the file
+            else if(!strcmp(argv[i],">")){
+               int fd;
+
+                fd = open("test.txt", O_WRONLY | O_CREAT | O_TRUNC, 0666);
+
+                if (dup2(fd, 1) < 0) { perror("dup2"); exit(1); }
+
+                 printf("Standard output now goes to file4\n");
+
+                 close(fd);
+            }    
+        }
 
         if(size == 2 && strcmp(argv[0],"cd")){
             execl(argv[0],argv[0],argv[1], (char*) NULL);
@@ -50,6 +78,7 @@ pid_t create_process() {
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
     //returns true if the child terminated normally,
     if (WIFEXITED(status)) {
+        //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
         printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
     //returns true if the child process was terminated by a signal.
     } else if (WIFSIGNALED(status)) {
@@ -64,6 +93,9 @@ pid_t create_process() {
 
 
 int main(void) {
+ 
+
+
     char str[MAX_PATH];
     //execl("/bin/ls","/bin/ls",  (char*) NULL);
     printFilepath(path);
