@@ -11,6 +11,7 @@
 int size;
 char argv[MAX_PATH][MAX_PATH];
 char path[MAX_PATH];
+int stat;
 
 // The entered
 // text is split into command name and arguments. Arguments are separated from each other and from the command
@@ -69,8 +70,8 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
         clean_argv[index++] = argv[i];    
         }
         clean_argv[index] = NULL;
-        execvp(clean_argv[0], clean_argv); 
-        exit(0);
+        stat = execvp(clean_argv[0], clean_argv); 
+        exit(stat);
     }
 
     // If it is a background process, add to stack
@@ -81,7 +82,7 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
 
     //Gjør det i parrent så det er mulig å endre faktisk
      if(!strcmp(argv[0],"cd")){
-            chdir(argv[1]);
+            stat = chdir(argv[1]);
             getcwd(path, MAX_PATH);
             //printFilepath(path);
     }
