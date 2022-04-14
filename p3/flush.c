@@ -81,11 +81,21 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
     } 
 
     //Gjør det i parrent så det er mulig å endre faktisk
-     if(!strcmp(argv[0],"cd")){
+    if(!strcmp(argv[0],"cd")){
             stat = chdir(argv[1]);
             getcwd(path, MAX_PATH);
             //printFilepath(path);
     }
+
+    //list processes running
+    if(!strcmp(argv[0], "jobs")){
+        printf("yes\n");
+        for (int i = 0; i < MAX_BACKGROUND; i++){
+            if (p[i].active == 1)
+                printf("Pid: %i CMD: %c\n", p[i].process_id, p[i].command);
+            }
+    }
+
     //wait(0);
     //Parent wait
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
@@ -147,6 +157,7 @@ int main(void) {
     create_process(processes, index_stack, top);
 
     //TODO: Clean up processes
+
     for (int i = MAX_BACKGROUND - 1; i > top; i--) {
         //wait(0);
         //Parent wait
