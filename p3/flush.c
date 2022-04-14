@@ -156,7 +156,12 @@ int main(void) {
     }
     create_process(processes, index_stack, top);
 
-    //TODO: Clean up processes
+    //Clean up processes
+    for (int i = 0; i < MAX_BACKGROUND; i++) {
+            if (processes[i].active != 1) {
+                remove_process(processes, i, index_stack, &top);
+            }
+
 
     for (int i = MAX_BACKGROUND - 1; i > top; i--) {
         //wait(0);
