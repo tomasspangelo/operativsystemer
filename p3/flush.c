@@ -42,8 +42,18 @@ void child_handler(int sig) {
     pid_t pid;
     while ((pid = waitpid(-1, &status, 0)) > 0) {
         if (WIFEXITED(status)) {
-            //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
-            printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
+             printf("Exit status[");
+        for (int i = 0; i < size; i++)
+        {
+            if(i == size-1){
+                 printf("%s", argv[i]);
+            }
+            else{
+                 printf("%s ", argv[i]);
+            }
+        }
+
+        printf("] = %d\n",WEXITSTATUS(status));
         //returns true if the child process was terminated by a signal.
         } else if (WIFSIGNALED(status)) {
             printf("killed by signal %d\n", WTERMSIG(status));
