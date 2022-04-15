@@ -162,7 +162,7 @@ int main(void) {
                 waitpid(processes[i].process_id, NULL, WNOHANG); //WNOHANG gjør at prosessen ikke blir  blokkert, men går videre. Bra forklaring her: https://stackoverflow.com/questions/33508997/waitpid-wnohang-wuntraced-how-do-i-use-these
                 remove_process(processes, i, index_stack, &top);
             }
-
+        }
 
     for (int i = MAX_BACKGROUND - 1; i > top; i--) {
         //wait(0);
