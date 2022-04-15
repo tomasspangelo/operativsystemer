@@ -40,7 +40,16 @@ void remove_process(struct Process *p, int index, int *index_stack, int *top) {
 void child_handler(int sig) {
     int status;
     pid_t pid;
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+    while ((pid = waitpid(-1, &status, 0)) > 0) {
+        if (WIFEXITED(status)) {
+            //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
+            printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
+        //returns true if the child process was terminated by a signal.
+        } else if (WIFSIGNALED(status)) {
+            printf("killed by signal %d\n", WTERMSIG(status));
+        //returns true if the child process was stopped by delivery of a signal
+        } else if (WIFSTOPPED(status)) {
+            printf("stopped by signal %d\n", WSTOPSIG(status));}
     }
 }
 
@@ -98,7 +107,6 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
 
     //list processes running
     if(!strcmp(argv[0], "jobs")){
-        printf("yes\n");
         for (int i = 0; i < MAX_BACKGROUND; i++){
             if (p[i].active == 1)
                 printf("Pid: %i CMD: %c\n", p[i].process_id, p[i].command);
@@ -109,15 +117,19 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
     //Parent wait
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
     //returns true if the child terminated normally,
+    /*
+
     if (WIFEXITED(status)) {
         //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
         printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
     //returns true if the child process was terminated by a signal.
     } else if (WIFSIGNALED(status)) {
-        printf("killed by signal %d\n", WTERMSIG(status));
+        //printf("killed by signal %d\n", WTERMSIG(status));
     //returns true if the child process was stopped by delivery of a signal
     } else if (WIFSTOPPED(status)) {
         printf("stopped by signal %d\n", WSTOPSIG(status));}
+        
+    */
   
     return pid;
     
@@ -175,6 +187,8 @@ int main(void) {
         if (w == 0) {
             continue;
         }
+        /*
+
          //returns true if the child terminated normally,
         if (WIFEXITED(status)) {
             //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
@@ -184,7 +198,9 @@ int main(void) {
             printf("killed by signal %d\n", WTERMSIG(status));
         //returns true if the child process was stopped by delivery of a signal
         } else if (WIFSTOPPED(status)) {
-            printf("stopped by signal %d\n", WSTOPSIG(status));}
+            printf("stopped by signal %d\n", WSTOPSIG(status));} 
+
+        */
         remove_process(processes, i, index_stack, top);
         
     }
