@@ -37,11 +37,19 @@ void remove_process(struct Process *p, int index, int *index_stack, int *top) {
     index_stack[*top] = index;
 }
 
+void child_handler(int sig) {
+    int status;
+    pid_t pid;
+    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+    }
+}
+
+
 pid_t create_process(struct Process *p, int *index_stack, int *top) {
     pid_t pid;
     pid_t cpid, w;
     int status;
-    signal(SIGCHLD, SIG_IGN);
+    signal(SIGCHLD, child_handler);
     pid = fork();
 
     if (pid == 0) {
@@ -156,15 +164,7 @@ int main(void) {
         size++;
     }
     create_process(processes, index_stack, top);
-    /*
-    //Clean up processes
-    for (int i = 0; i < MAX_BACKGROUND; i++) {
-            if (processes[i].process_id == 0) {
-                waitpid(processes[i].process_id, NULL, WNOHANG); //WNOHANG gjør at prosessen ikke blir  blokkert, men går videre. Bra forklaring her: https://stackoverflow.com/questions/33508997/waitpid-wnohang-wuntraced-how-do-i-use-these
-                remove_process(processes, i, index_stack, &top);
-            }
-        }
-    */
+
     for (int i = MAX_BACKGROUND - 1; i > top; i--) {
         //wait(0);
         //Parent wait
