@@ -117,6 +117,8 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
     //Parent wait
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
     //returns true if the child terminated normally,
+    /*
+    
     if (WIFEXITED(status)) {
         //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
         printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
@@ -127,6 +129,7 @@ pid_t create_process(struct Process *p, int *index_stack, int *top) {
     } else if (WIFSTOPPED(status)) {
         printf("stopped by signal %d\n", WSTOPSIG(status));}
 
+    */
     
   
     return pid;
