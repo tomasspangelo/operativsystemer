@@ -161,13 +161,13 @@ int main(void) {
     }
     int top = MAX_BACKGROUND - 1;
 
-    //char str[MAX_PATH];
+    char str[MAX_PATH];
     //execl("/bin/ls","/bin/ls",  (char*) NULL);
     printFilepath(path);
     //chdir("..");
     //printFilepath(path);
-    //scanf("%[^\n]%*c", str);
-    char str[] = "jobs";
+    scanf("%[^\n]%*c", str);
+    //char str[] = "jobs";
     int flag=0;
 
     while(flag != EOF ){
