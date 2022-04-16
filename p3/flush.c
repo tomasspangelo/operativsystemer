@@ -1,11 +1,4 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include "flush.h"
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <fcntl.h>
 
 #define MAX_BACKGROUND 10
 char path[MAX_PATH];
