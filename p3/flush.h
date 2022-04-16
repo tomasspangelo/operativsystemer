@@ -10,6 +10,7 @@
 struct Process {
     pid_t process_id;
     int active;
-    char command[MAX_PATH];
+    char argv[MAX_PATH][MAX_PATH];
+    int size;
 };
 #endif
