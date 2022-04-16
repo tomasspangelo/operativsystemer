@@ -57,7 +57,6 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
     if(!strcmp(argv[0], "jobs")){
         for (int i = 0; i < MAX_BACKGROUND; i++){
             if (p[i].active == 1) {
-                printf("WTF\n");
                 printf("pid: %i CMD: ", p[i].process_id);
                 for (int j = 0; j < p[i].size; j++) {
                     if (j == p[i].size - 1) {
