@@ -26,14 +26,13 @@ void add_process(struct Process *p, pid_t pid, int *index_stack, int *top, char 
 
 struct Process remove_process(struct Process *p, pid_t pid, int *index_stack, int *top) {
     int index = -1;
-    //printf("%d\n", MAX_BACKGROUND - *top);
+
     for (int i = 0; i < MAX_BACKGROUND - *top; i++){
         if (p[i].process_id == pid) {
             index = i;
             break;
         }
     }
-    //printf("%d\n", index);
     p[index].active = 0;
     (*top) ++;
     index_stack[*top] = index;
@@ -45,11 +44,10 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
     pid_t cpid, w;
     int status;
 
-    //Gjør det i parrent så det er mulig å endre faktisk
+    //Does not fork, so that it changes directory in parrent process
      if(!strcmp(argv[0],"cd")){
             chdir(argv[1]);
             getcwd(path, MAX_PATH);
-            //printFilepath(path);
             return;
     }
 
@@ -71,6 +69,7 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
     }
     pid = fork();
 
+    //If it is child process, execute command
     if (pid == 0) {
         char *clean_argv[size+1];
         int index = 0;
@@ -112,12 +111,12 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
         return;
     } 
 
-    //wait(0);
+  
     //Parent wait
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
-    //returns true if the child terminated normally,
+    // WIFEXITED(status) returns true if the child terminated normally,
     if (WIFEXITED(status)) {
-             printf("Exit status[");
+        printf("Exit status[");
         for (int i = 0; i < size; i++)
         {
             if(i == size-1){
@@ -129,12 +128,12 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
         }
 
         printf("] = %d\n",WEXITSTATUS(status));
-        //returns true if the child process was terminated by a signal.
         } 
+    // (WIFSIGNALED(status) returns true if the child process was terminated by a signal.
     else if (WIFSIGNALED(status)) {
         printf("killed by signal %d\n", WTERMSIG(status));
-        //returns true if the child process was stopped by delivery of a signal
         } 
+    // WIFSTOPPED(status) returns true if the child process was stopped by delivery of a signal
     else if (WIFSTOPPED(status)) {
         printf("stopped by signal %d\n", WSTOPSIG(status));
         }
@@ -152,110 +151,66 @@ int main(void) {
         index_stack[i] = MAX_BACKGROUND - i - 1;
     }
     int top = MAX_BACKGROUND - 1;
-
     char str[MAX_PATH];
-    //execl("/bin/ls","/bin/ls",  (char*) NULL);
+
+    //Initial input from user
     printFilepath(path);
-    //chdir("..");
-    //printFilepath(path);
     scanf("%[^\n]%*c", str);
-    //char str[] = "jobs";
+
     int flag=0;
 
+    //Checks if input is End Of File (CTRL-D)
     while(flag != EOF ){
-    //printf("%s", str);
+        char *found;
 
+        char *tok =str, *end = str;
+        int size = 0;
+        char argv[MAX_PATH][MAX_PATH];
 
-    char *found;
-    
-    //printf("Original string: '%s'\n",str);
-
-    //printf("Does it work?\n");
-    //system(str);
-
-    char *tok =str, *end = str;
-    int size = 0;
-    char argv[MAX_PATH][MAX_PATH];
-    while( tok != NULL ){
-        strsep(&end, " ");
-        found = tok;
-        strcpy(argv[size], tok);
-        //printf("Her kommer det\n");
-        //printf("%s\n",argv[i]);
-        tok = end;
-        size++;
-    }
-    create_process(processes, index_stack, &top, str, size, argv);
-
-    // Clean up processes
-    pid_t pid;
-    int status;
-    while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
-        struct Process p = remove_process(processes, pid, index_stack, &top);
-        if (WIFEXITED(status)) {
-             printf("Exit status[");
-        for (int i = 0; i < p.size; i++)
-        {
-            if(i == p.size-1){
-                 printf("%s", p.argv[i]);
-            }
-            else{
-                 printf("%s ", p.argv[i]);
-            }
+        // Checks every argumen of commanline from user
+        while( tok != NULL ){
+            strsep(&end, " ");
+            found = tok;
+            strcpy(argv[size], tok);
+            tok = end;
+            size++;
         }
+        create_process(processes, index_stack, &top, str, size, argv);
 
-        printf("] = %d\n",WEXITSTATUS(status));
-        //returns true if the child process was terminated by a signal.
-        } 
-        else if (WIFSIGNALED(status)) {
-            printf("killed by signal %d\n", WTERMSIG(status));
-            //returns true if the child process was stopped by delivery of a signal
-            } 
-        else if (WIFSTOPPED(status)) {
-            printf("stopped by signal %d\n", WSTOPSIG(status));
-            }
-  
-
-    }
-
-    //TODO: Clean up processes
-    /*
-    for (int i = 0; i < MAX_BACKGROUND; i++) {
-        if (!processes[i].active){
-            continue;
-        }
-        //wait(0);
-        //Parent wait
+        // Clean up processes
+        pid_t pid;
         int status;
-        int w = waitpid(processes[i].process_id, &status, WNOHANG);
-        printf("%d\n", w);
-        // If not finished -> continue
-        if (w != 0) {
-            printf("WHAT!\n");
-            continue;
+        while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+            struct Process p = remove_process(processes, pid, index_stack, &top);
+            if (WIFEXITED(status)) {
+                printf("Exit status[");
+                for (int i = 0; i < p.size; i++)
+                {
+                    if(i == p.size-1){
+                        printf("%s", p.argv[i]);
+                    }
+                    else{
+                        printf("%s ", p.argv[i]);
+                    }
+                }
+
+            printf("] = %d\n",WEXITSTATUS(status));
+            //returns true if the child process was terminated by a signal.
+            } 
+            else if (WIFSIGNALED(status)) {
+                printf("killed by signal %d\n", WTERMSIG(status));
+                //returns true if the child process was stopped by delivery of a signal
+                } 
+            else if (WIFSTOPPED(status)) {
+                printf("stopped by signal %d\n", WSTOPSIG(status));
+                }
+    
+
         }
-        printf("KILL!\n");
-         //returns true if the child terminated normally,
-        if (WIFEXITED(status)) {
-            //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
-            printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
-        //returns true if the child process was terminated by a signal.
-        } else if (WIFSIGNALED(status)) {
-            printf("killed by signal %d\n", WTERMSIG(status));
-        //returns true if the child process was stopped by delivery of a signal
-        } else if (WIFSTOPPED(status)) {
-            printf("stopped by signal %d\n", WSTOPSIG(status));}
-        remove_process(processes, i, index_stack, &top);
-        
-    }
-    */
-
-   
-    printf("%s:\n", path);
-    flag = scanf("%[^\n]%*c", str);
-    //char str[] = "ls &";
-
-    //system(str);
+    
+        //Print filepath
+        printf("%s:\n", path);
+        flag = scanf("%[^\n]%*c", str);
 
     }
         
