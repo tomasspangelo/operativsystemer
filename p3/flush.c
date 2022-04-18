@@ -1,17 +1,17 @@
 #include "flush.h"
 
-#define MAX_BACKGROUND 10
-char path[MAX_PATH];
+#define MAX_BACKGROUND 10 // Maximum number of background processes
+char path[MAX_PATH]; // Current path
 
 // The entered
 // text is split into command name and arguments. Arguments are separated from each other and from the command
 // name by space (ASCII 0x20) or tab (0x09) characters.
-
 void printFilepath( char *path ){
     getcwd(path, MAX_PATH);
     printf("%s:\n", path);
 }
 
+// Add process to list of background processes
 void add_process(struct Process *p, pid_t pid, int *index_stack, int *top, char argv[MAX_PATH][MAX_PATH], int size) {
     struct Process new_process;
     for(int i = 0; i < size; i++) {
@@ -39,6 +39,7 @@ struct Process remove_process(struct Process *p, pid_t pid, int *index_stack, in
     return p[index];
 }
 
+// Create a new process (or execute internal shell command)
 void create_process(struct Process *p, int *index_stack, int *top, char *command, int size, char argv[MAX_PATH][MAX_PATH]) {
     pid_t pid;
     pid_t cpid, w;
@@ -112,7 +113,7 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
     } 
 
   
-    //Parent wait
+    //Parent wait (if it is not a background process)
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
     // WIFEXITED(status) returns true if the child terminated normally,
     if (WIFEXITED(status)) {
@@ -145,8 +146,10 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
 
 int main(void) {
  
-    struct Process processes[MAX_BACKGROUND];
-    int index_stack[MAX_BACKGROUND];
+    struct Process processes[MAX_BACKGROUND]; // List of background processes
+    int index_stack[MAX_BACKGROUND]; // Stack for indices not used for background processes
+
+    // Add indices to stack
     for (int i = 0; i < MAX_BACKGROUND; i++) {
         index_stack[i] = MAX_BACKGROUND - i - 1;
     }
@@ -167,7 +170,7 @@ int main(void) {
         int size = 0;
         char argv[MAX_PATH][MAX_PATH];
 
-        // Checks every argumen of commanline from user
+        // Checks every argument of commandline from user
         while( tok != NULL ){
             strsep(&end, " ");
             found = tok;
@@ -175,6 +178,7 @@ int main(void) {
             tok = end;
             size++;
         }
+        // Create new process (or execute internal shell command)
         create_process(processes, index_stack, &top, str, size, argv);
 
         // Clean up processes
