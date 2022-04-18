@@ -75,22 +75,22 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
         int index = 0;
         for(int i = 0; i<size; i++){
 
-            // looking for input character
+            // look for input character
             if(!strcmp(argv[i],"<")){
                 ++i;
                 int fd;
                 fd = open(argv[i], O_RDONLY);
-                dup2(fd, STDIN_FILENO); // duplicate stdin to input file
+                dup2(fd, STDIN_FILENO); // duplicate standard in to input file
                 close(fd);
                 continue;  
             }  
 
-            // looking for output character
+            // look for output character
             if(!strcmp(argv[i],">")){
                 ++i;
                 int fd;
                 fd = creat(argv[i], 0644); // create a new file or rewrite an existing one
-                dup2(fd, STDOUT_FILENO); // redirect stdout to file
+                dup2(fd, STDOUT_FILENO); // redirect standard out to file
                 close(fd); 
                 continue;
             }
