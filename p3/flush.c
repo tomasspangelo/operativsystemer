@@ -3,9 +3,7 @@
 #define MAX_BACKGROUND 10 // Maximum number of background processes
 char path[MAX_PATH]; // Current path
 
-// The entered
-// text is split into command name and arguments. Arguments are separated from each other and from the command
-// name by space (ASCII 0x20) or tab (0x09) characters.
+//Prints current working directory 
 void printFilepath( char *path ){
     getcwd(path, MAX_PATH);
     printf("%s:\n", path);
@@ -46,6 +44,8 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
     int status;
 
     //Does not fork, so that it changes directory in parrent process
+    //Change directory.
+    //Assumes it is the first command, and that to what comes i second command
      if(!strcmp(argv[0],"cd")){
             chdir(argv[1]);
             getcwd(path, MAX_PATH);
@@ -186,6 +186,7 @@ int main(void) {
         int status;
         while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
             struct Process p = remove_process(processes, pid, index_stack, &top);
+            // WIFEXITED(status) returns true if the child terminated normally,
             if (WIFEXITED(status)) {
                 printf("Exit status[");
                 for (int i = 0; i < p.size; i++)

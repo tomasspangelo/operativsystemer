@@ -1,7 +1,0 @@
->
-fil
-fil2.txt
-flush
-flush.c
-flush.h
-tmp
