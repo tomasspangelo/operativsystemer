@@ -171,8 +171,9 @@ int main(void) {
         char argv[MAX_PATH][MAX_PATH];
 
         // Checks every argument of commandline from user
+        // Seperate on tab or whitespace
         while( tok != NULL ){
-            strsep(&end, " ");
+            strsep(&end, "  \t");
             found = tok;
             strcpy(argv[size], tok);
             tok = end;
@@ -200,7 +201,7 @@ int main(void) {
                 }
 
             printf("] = %d\n",WEXITSTATUS(status));
-            //returns true if the child process was terminated by a signal
+            //returns true if the child process was terminated by a signa
             } 
             else if (WIFSIGNALED(status)) {
                 printf("killed by signal %d\n", WTERMSIG(status));
