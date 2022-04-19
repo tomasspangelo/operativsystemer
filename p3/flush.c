@@ -115,7 +115,7 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
   
     //Parent wait (if it is not a background process)
     w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
-    // WIFEXITED(status) returns true if the child terminated normally,
+    // WIFEXITED(status) returns true if the child terminated normally
     if (WIFEXITED(status)) {
         printf("Exit status[");
         for (int i = 0; i < size; i++)
@@ -130,7 +130,7 @@ void create_process(struct Process *p, int *index_stack, int *top, char *command
 
         printf("] = %d\n",WEXITSTATUS(status));
         } 
-    // (WIFSIGNALED(status) returns true if the child process was terminated by a signal.
+    // (WIFSIGNALED(status) returns true if the child process was terminated by a signal
     else if (WIFSIGNALED(status)) {
         printf("killed by signal %d\n", WTERMSIG(status));
         } 
@@ -186,7 +186,7 @@ int main(void) {
         int status;
         while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
             struct Process p = remove_process(processes, pid, index_stack, &top);
-            // WIFEXITED(status) returns true if the child terminated normally,
+            // WIFEXITED(status) returns true if the child terminated normally
             if (WIFEXITED(status)) {
                 printf("Exit status[");
                 for (int i = 0; i < p.size; i++)
@@ -200,7 +200,7 @@ int main(void) {
                 }
 
             printf("] = %d\n",WEXITSTATUS(status));
-            //returns true if the child process was terminated by a signal.
+            //returns true if the child process was terminated by a signal
             } 
             else if (WIFSIGNALED(status)) {
                 printf("killed by signal %d\n", WTERMSIG(status));
