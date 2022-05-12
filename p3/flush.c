@@ -1,48 +1,123 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <string.h>
 #include "flush.h"
-#include <sys/types.h>
-#include <sys/wait.h>
-#include <fcntl.h>
 
-#define MAX_BACKGROUND 10
-int size;
-char argv[MAX_PATH][MAX_PATH];
-char path[MAX_PATH];
-int stat;
+#define MAX_BACKGROUND 10 // Maximum number of background processes
+char path[MAX_PATH]; // Current path
 
-// The entered
-// text is split into command name and arguments. Arguments are separated from each other and from the command
-// name by space (ASCII 0x20) or tab (0x09) characters.
-
+//Prints current working directory 
 void printFilepath( char *path ){
     getcwd(path, MAX_PATH);
     printf("%s:\n", path);
 }
 
-void add_process(struct Process *p, pid_t pid, char* command, int *index_stack, int *top) {
+// Add process to list of background processes
+void add_process(struct Process *p, pid_t pid, int *index_stack, int *top, char argv[MAX_PATH][MAX_PATH], int size) {
     struct Process new_process;
-    strcpy(new_process.command, command);
+    for(int i = 0; i < size; i++) {
+        strcpy(new_process.argv[i], argv[i]);
+    }
+    new_process.size = size;
     new_process.active = 1;
     new_process.process_id = pid;
     p[index_stack[*top]] = new_process;
     (*top) --;
 }
 
-void remove_process(struct Process *p, int index, int *index_stack, int *top) {
+struct Process remove_process(struct Process *p, pid_t pid, int *index_stack, int *top) {
+    int index = -1;
+
+    for (int i = 0; i < MAX_BACKGROUND - *top; i++){
+        if (p[i].process_id == pid) {
+            index = i;
+            break;
+        }
+    }
     p[index].active = 0;
     (*top) ++;
     index_stack[*top] = index;
+    return p[index];
 }
 
-void child_handler(int sig) {
-    int status;
+// Create a new process (or execute internal shell command)
+void create_process(struct Process *p, int *index_stack, int *top, char *command, int size, char argv[MAX_PATH][MAX_PATH]) {
     pid_t pid;
-    while ((pid = waitpid(-1, &status, 0)) > 0) {
-        if (WIFEXITED(status)) {
-             printf("Exit status[");
+    pid_t cpid, w;
+    int status;
+
+    //Does not fork, so that it changes directory in parrent process
+    //Change directory.
+    //Assumes it is the first command, and that to what comes i second command
+     if(!strcmp(argv[0],"cd")){
+            chdir(argv[1]);
+            getcwd(path, MAX_PATH);
+            return;
+    }
+
+    //list processes running
+    if(!strcmp(argv[0], "jobs")){
+        for (int i = 0; i < MAX_BACKGROUND; i++){
+            if (p[i].active == 1) {
+                printf("pid: %i CMD: ", p[i].process_id);
+                for (int j = 0; j < p[i].size; j++) {
+                    if (j == p[i].size - 1) {
+                        printf("%s\n", p[i].argv[j]);
+                        continue;
+                    }
+                    printf("%s ", p[i].argv[j]);
+                }
+            }
+        }
+        return;
+    }
+    pid = fork();
+
+    //If it is child process, execute command
+    if (pid == 0) {
+        char *clean_argv[size+1];
+        int index = 0;
+        for(int i = 0; i<size; i++){
+
+            // look for input character
+            if(!strcmp(argv[i],"<")){
+                ++i;
+                int fd;
+                fd = open(argv[i], O_RDONLY);
+                dup2(fd, STDIN_FILENO); // duplicate standard in to input file
+                close(fd);
+                continue;  
+            }  
+
+            // look for output character
+            if(!strcmp(argv[i],">")){
+                ++i;
+                int fd;
+                fd = creat(argv[i], 0644); // create a new file or rewrite an existing one
+                dup2(fd, STDOUT_FILENO); // redirect standard out to file
+                close(fd); 
+                continue;
+            }
+            // If it is not a background process, add argument
+            if (strcmp(argv[i], "&")){
+                clean_argv[index++] = argv[i]; 
+            }
+  
+        }
+        clean_argv[index] = NULL;
+        int stat = execvp(clean_argv[0], clean_argv); 
+        exit(stat);
+    }
+
+    // If it is a background process, add to stack
+    if (!strcmp(argv[size - 1], "&")){
+        add_process(p, pid, index_stack, top, argv, size);
+        return;
+    } 
+
+  
+    //Parent wait (if it is not a background process)
+    w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
+    // WIFEXITED(status) returns true if the child terminated normally
+    if (WIFEXITED(status)) {
+        printf("Exit status[");
         for (int i = 0; i < size; i++)
         {
             if(i == size-1){
@@ -54,173 +129,94 @@ void child_handler(int sig) {
         }
 
         printf("] = %d\n",WEXITSTATUS(status));
-        //returns true if the child process was terminated by a signal.
-        } else if (WIFSIGNALED(status)) {
-            printf("killed by signal %d\n", WTERMSIG(status));
-        //returns true if the child process was stopped by delivery of a signal
-        } else if (WIFSTOPPED(status)) {
-            printf("stopped by signal %d\n", WSTOPSIG(status));}
-    }
-}
-
-
-pid_t create_process(struct Process *p, int *index_stack, int *top) {
-    pid_t pid;
-    pid_t cpid, w;
-    int status;
-    signal(SIGCHLD, child_handler);
-    pid = fork();
-
-    if (pid == 0) {
-        char *clean_argv[size+1];
-        int index = 0;
-        for(int i = 0; i<size; i++){
-
-            // looking for input character
-            if(!strcmp(argv[i],"<")){
-                ++i;
-                int fd;
-                fd = open(argv[i], O_RDONLY);
-                dup2(fd, STDIN_FILENO); // duplicate stdin to input file
-                close(fd);
-                continue;  
-            }  
-
-            // looking for output character
-            if(!strcmp(argv[i],">")){
-                ++i;
-                int fd;
-                fd = creat(argv[i], 0644); // create a new file or rewrite an existing one
-                dup2(fd, STDOUT_FILENO); // redirect stdout to file
-                close(fd); 
-                continue;
-            } 
-        clean_argv[index++] = argv[i];    
+        } 
+    // (WIFSIGNALED(status) returns true if the child process was terminated by a signal
+    else if (WIFSIGNALED(status)) {
+        printf("killed by signal %d\n", WTERMSIG(status));
+        } 
+    // WIFSTOPPED(status) returns true if the child process was stopped by delivery of a signal
+    else if (WIFSTOPPED(status)) {
+        printf("stopped by signal %d\n", WSTOPSIG(status));
         }
-        clean_argv[index] = NULL;
-        stat = execvp(clean_argv[0], clean_argv); 
-        exit(stat);
-    }
-
-    // If it is a background process, add to stack
-    if (!strcmp(argv[size - 1], "&")){
-        add_process(p, pid, path, index_stack, top);
-        return pid;
-    } 
-
-    //Gjør det i parrent så det er mulig å endre faktisk
-    if(!strcmp(argv[0],"cd")){
-            stat = chdir(argv[1]);
-            getcwd(path, MAX_PATH);
-            //printFilepath(path);
-    }
-
-    //list processes running
-    if(!strcmp(argv[0], "jobs")){
-        for (int i = 0; i < MAX_BACKGROUND; i++){
-            if (p[i].active == 1)
-                printf("Pid: %i CMD: %c\n", p[i].process_id, p[i].command);
-            }
-    }
-
-    //wait(0);
-    //Parent wait
-    w = waitpid(pid, &status, WUNTRACED | WCONTINUED);
-    //returns true if the child terminated normally,
-    /*
-    
-    if (WIFEXITED(status)) {
-        //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
-        printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
-    //returns true if the child process was terminated by a signal.
-    } else if (WIFSIGNALED(status)) {
-        //printf("killed by signal %d\n", WTERMSIG(status));
-    //returns true if the child process was stopped by delivery of a signal
-    } else if (WIFSTOPPED(status)) {
-        printf("stopped by signal %d\n", WSTOPSIG(status));}
-
-    */
-    
   
-    return pid;
+    return;
     
 }
 
 
 int main(void) {
  
-    struct Process processes[MAX_BACKGROUND];
-    int index_stack[MAX_BACKGROUND];
+    struct Process processes[MAX_BACKGROUND]; // List of background processes
+    int index_stack[MAX_BACKGROUND]; // Stack for indices not used for background processes
+
+    // Add indices to stack
     for (int i = 0; i < MAX_BACKGROUND; i++) {
         index_stack[i] = MAX_BACKGROUND - i - 1;
     }
     int top = MAX_BACKGROUND - 1;
-
     char str[MAX_PATH];
-    //execl("/bin/ls","/bin/ls",  (char*) NULL);
+
+    //Initial input from user
     printFilepath(path);
-    //chdir("..");
-    //printFilepath(path);
     scanf("%[^\n]%*c", str);
+
     int flag=0;
 
+    //Checks if input is End Of File (CTRL-D)
     while(flag != EOF ){
-    //printf("%s", str);
+        char *found;
 
+        char *tok =str, *end = str;
+        int size = 0;
+        char argv[MAX_PATH][MAX_PATH];
 
-    char *found;
-    
-    //printf("Original string: '%s'\n",str);
-
-    //printf("Does it work?\n");
-    //system(str);
-
-    char *tok =str, *end = str;
-    size = 0;
-    while( tok != NULL ){
-        strsep(&end, " ");
-        found = tok;
-        strcpy(argv[size], tok);
-        //printf("Her kommer det\n");
-        //printf("%s\n",argv[i]);
-        tok = end;
-        size++;
-    }
-    create_process(processes, index_stack, top);
-
-    for (int i = MAX_BACKGROUND - 1; i > top; i--) {
-        //wait(0);
-        //Parent wait
-        int status;
-        int w = waitpid(processes[i].process_id, &status, WNOHANG);
-
-        // If not finished -> continue
-        if (w == 0) {
-            continue;
+        // Checks every argument of commandline from user
+        // Seperate on tab or whitespace
+        while( tok != NULL ){
+            strsep(&end, "  \t");
+            found = tok;
+            strcpy(argv[size], tok);
+            tok = end;
+            size++;
         }
-        /*
+        // Create new process (or execute internal shell command)
+        create_process(processes, index_stack, &top, str, size, argv);
 
-         //returns true if the child terminated normally,
-        if (WIFEXITED(status)) {
-            //antagligvis feil, dette er om det gikk bra med barn, men vi vil ha om selve kommand fungerte
-            printf("Exit status[%s %s] = %d\n", argv[0], argv[1], WEXITSTATUS(status));
-        //returns true if the child process was terminated by a signal.
-        } else if (WIFSIGNALED(status)) {
-            printf("killed by signal %d\n", WTERMSIG(status));
-        //returns true if the child process was stopped by delivery of a signal
-        } else if (WIFSTOPPED(status)) {
-            printf("stopped by signal %d\n", WSTOPSIG(status));} 
+        // Clean up processes
+        pid_t pid;
+        int status;
+        while ((pid = waitpid(-1, &status, WNOHANG)) > 0) {
+            struct Process p = remove_process(processes, pid, index_stack, &top);
+            // WIFEXITED(status) returns true if the child terminated normally
+            if (WIFEXITED(status)) {
+                printf("Exit status[");
+                for (int i = 0; i < p.size; i++)
+                {
+                    if(i == p.size-1){
+                        printf("%s", p.argv[i]);
+                    }
+                    else{
+                        printf("%s ", p.argv[i]);
+                    }
+                }
 
-        */
-        remove_process(processes, i, index_stack, top);
-        
-    }
+            printf("] = %d\n",WEXITSTATUS(status));
+            //returns true if the child process was terminated by a signa
+            } 
+            else if (WIFSIGNALED(status)) {
+                printf("killed by signal %d\n", WTERMSIG(status));
+                //returns true if the child process was stopped by delivery of a signal
+                } 
+            else if (WIFSTOPPED(status)) {
+                printf("stopped by signal %d\n", WSTOPSIG(status));
+                }
+    
 
-   
-    printf("%s:\n", path);
-    flag = scanf("%[^\n]%*c", str);
-
-    //system(str);
+        }
+    
+        //Print filepath
+        printf("%s:\n", path);
+        flag = scanf("%[^\n]%*c", str);
 
     }
         
